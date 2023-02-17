@@ -1,0 +1,4 @@
+rootProject.name = 'mobile-communication-cost-accounting'
+includeBuild 'import-service'
+includeBuild 'config-service'
+includeBuild 'gateway-service'
