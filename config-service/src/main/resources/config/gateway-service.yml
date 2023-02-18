@@ -13,14 +13,17 @@ spring:
           predicates:
             - Path=/import/**
     consul:
-      host: localhost
-      port: 8500
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
       discovery:
         instanceId: ${spring.application.name}:${random.value}
 
-springdoc:
-  swagger-ui:
-    use-root-path: true
-    urls:
-      - name: import-service
-        url: /import-service/v3/api-docs
+#springdoc:
+#  swagger-ui:
+#    use-root-path: true
+#    urls:
+#      - name: import-service
+#        url: /import-service/v3/api-docs
+#
+#    urls:
+#      -

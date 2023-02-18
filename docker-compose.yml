@@ -1,0 +1,186 @@
+version: "3.7"
+
+networks:
+  mobile-communication-net:
+    name: mobile-communication-net
+    driver: bridge
+
+services:
+  consul:
+    container_name: consul
+    image: consul:1.14.4
+    ports:
+      - "8500:8500"
+#    volumes:
+#      - consul_data:/consul/data
+    networks:
+      - mobile-communication-net
+
+  import_db_service:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=import_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=sa
+    restart: always
+    ports:
+      - "5433:5432"
+    volumes:
+      - import_db:/var/lib/postgresql/data
+    networks:
+      - mobile-communication-net
+
+#  zookeeper_my_app:
+#    image: bitnami/zookeeper:3.8.0
+#    container_name: zookeeper_my_app
+#    restart: always
+#    networks:
+#      - mobile-communication-net
+#    ports:
+#      - "2182:2181"
+#    environment:
+#      ALLOW_ANONYMOUS_LOGIN: yes
+#
+#  kafka_my_app:
+#    image: bitnami/kafka:3.3.1
+#    container_name: kafka_my_app
+#    restart: always
+#    networks:
+#      - mobile-communication-net
+#    ports:
+#      - "9093:9093"
+#    environment:
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
+#      KAFKA_LISTENERS: DOCKER_INTERNAL://:29093,DOCKER_EXTERNAL://:9093
+#      KAFKA_ADVERTISED_LISTENERS: DOCKER_INTERNAL://kafka_my_app:29093,DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9093
+#      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
+#      KAFKA_ZOOKEEPER_CONNECT: "zookeeper_my_app:2181"
+#      KAFKA_BROKER_ID: 1
+#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      ALLOW_PLAINTEXT_LISTENER: yes
+#    depends_on:
+#      - zookeeper_my_app
+#
+#  kafdrop_my_app:
+#    image: obsidiandynamics/kafdrop:3.30.0
+#    container_name: kafdrop_my_app
+#    restart: always
+#    networks:
+#      - mobile-communication-net
+#    ports:
+#      - "9001:9000"
+#    environment:
+#      KAFKA_BROKERCONNECT: "kafka_my_app:29093"
+#    depends_on:
+#      - "kafka_my_app"
+
+  config-service:
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+    image: config-service:latest
+    container_name: config-service-app
+    ports:
+      - "8888:8888"
+    environment:
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+#      BASEDIR: file:///home/igor/config-repo
+    restart: always
+    networks:
+      - mobile-communication-net
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    image: gateway-service:latest
+    container_name: gateway-service-app
+    ports:
+      - "8765:8765"
+    environment:
+      CONFIG_SERVICE_URL: http://config-service:8888
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+#      AUTHORIZATION_SERVICE: http://authorization-service:9002
+    restart: always
+    networks:
+      - mobile-communication-net
+    depends_on:
+      - config-service
+#      - discovery-service
+
+  import-service:
+    build:
+      context: ./import-service
+      dockerfile: Dockerfile
+    image: import-service:latest
+    container_name: import-service-app
+    ports:
+      - "8082:8082"
+    environment:
+      POSTGRES_DB_HOST: import_db_service
+      POSTGRES_DB_PORT: 5432
+      POSTGRES_DB_USERNAME: postgres
+      POSTGRES_DB_PASSWORD: sa
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      CONFIG_SERVICE_URL: http://config-service:8888
+    restart: always
+    networks:
+      - mobile-communication-net
+    depends_on:
+      - config-service
+      - import_db_service
+#      - discovery-service
+
+#  authorization-service:
+#    build:
+#      context: ./authorization-service
+#      dockerfile: Dockerfile
+#    image: authorization-service:latest
+#    container_name: authorization-service-app
+#    ports:
+#      - "9002:9002"
+#    environment:
+#      EUREKA_URL: http://discovery-service:8761/eureka
+#      CONFIG_SERVICE_URL: http://config-service:8888
+##      REDIRECT_URL: http://gateway-service:8765/
+#      REDIRECT_URL: http://127.0.0.1:8765/
+#      PROVIDER_URL: http://authorization-service:9002
+##      PROVIDER_URL: http://localhost:9002
+#    restart: always
+#    networks:
+#      - mobile-communication-net
+#    depends_on:
+#      - config-service
+#      - discovery-service
+#
+#  user-service:
+#    build:
+#      context: ./user-service
+#      dockerfile: Dockerfile
+#    image: user-service:latest
+#    container_name: user-service-service-app
+#    ports:
+#      - "8082:8082"
+#    environment:
+#      POSTGRES_DB_HOST: user_db_service
+#      POSTGRES_DB_PORT: 5432
+#      POSTGRES_DB_USERNAME: postgres
+#      POSTGRES_DB_PASSWORD: sa
+#      EUREKA_URL: http://discovery-service:8761/eureka
+#      CONFIG_SERVICE_URL: http://config-service:8888
+#      AUTHORIZATION_SERVICE: http://authorization-service:9002
+#    restart: always
+#    networks:
+#      - mobile-communication-net
+#    depends_on:
+#      - config-service
+#      - user_db_service
+#      - discovery-service
+
+volumes:
+  import_db:
+#  consul_data:
+

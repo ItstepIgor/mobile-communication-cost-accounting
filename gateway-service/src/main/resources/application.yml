@@ -3,3 +3,10 @@ spring:
     name: gateway-service
   config:
     import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:8888}
+springdoc:
+  swagger-ui:
+    use-root-path: true
+    urls:
+      - name: import-service
+        url: /import-service/v3/api-docs
+

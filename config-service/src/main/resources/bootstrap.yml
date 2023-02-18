@@ -5,3 +5,9 @@ spring:
     name: config-service
   profiles:
     active: native
+  cloud:
+    consul:
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        instanceId: ${spring.application.name}:${random.value}
