@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "calls")
 public class Call {
 
     @Id
@@ -32,7 +32,7 @@ public class Call {
     private String code;
 
     @Column(nullable = false)
-    private LocalTime callTime;
+    private String callTime;
 
     @Column(nullable = false)
     private String number;

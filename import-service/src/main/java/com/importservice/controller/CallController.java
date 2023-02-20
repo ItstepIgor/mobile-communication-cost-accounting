@@ -2,10 +2,8 @@ package com.importservice.controller;
 
 import com.importservice.service.CallService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,10 +18,17 @@ public class CallController {
         return "All is OK!!!";
     }
 
-    @GetMapping("/upload")
+
+    //TODO Удалить после настройки импорта
+    @GetMapping("/uploadfromharddisk")
     public void create() {
         String file = "e:\\1\\01.2023.xlsx";
-        callService.readFromExcel(file);
+        callService.createFromFile(file);
     }
+    //до это строки удалить
 
+    @PostMapping("/upload")
+    public void uploadFile(@RequestParam("file") MultipartFile file) {
+                callService.create(file);
+    }
 }

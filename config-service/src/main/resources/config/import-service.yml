@@ -14,4 +14,4 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
-    show-sql: true
+#    show-sql: true

@@ -1,11 +1,9 @@
 package com.importservice.service;
 
-import com.importservice.entity.Call;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface CallService {
 
-    void create(Call call);
-
-    void readFromExcel(String file);
-
+    void createFromFile(String file);
+    void create(MultipartFile file);
 }
