@@ -1,0 +1,58 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.2'
+	id 'io.spring.dependency-management' version '1.1.0'
+}
+
+apply from: 'version.gradle'
+
+group = 'com'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+bootJar {
+	archiveFileName = 'calculate-service.jar'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.cloud:spring-cloud-starter-config'
+	implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+	implementation "org.liquibase:liquibase-core:${versions.liquibase}"
+	implementation 'org.postgresql:postgresql'
+	implementation "org.projectlombok:lombok-mapstruct-binding:${versions.lmBinding}"
+	implementation "org.mapstruct:mapstruct:${versions.mapstruct}"
+
+	compileOnly "org.projectlombok:lombok:${versions.lombok}"
+	annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${versions.mapstruct}"
+	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:${versions.lmBinding}"
+
+	testCompileOnly "org.projectlombok:lombok:${versions.lombok}"
+	testAnnotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${versions.springCloudVersion}"
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
