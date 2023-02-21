@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -44,12 +45,14 @@ public class CallServiceImpl implements CallService {
         XSSFSheet myExcelSheet = myExcelBook.getSheet("Page4");
         String ownerNumberTemp = null;
 
-        for (Row row : myExcelSheet) {
-            if (row.getCell(0).getCellType() == CellType.BLANK) {
-                continue;
-            } else if ((row.getCell(0).getStringCellValue()
-                    .equals("Итого начислений по абоненту")) || (row.getCell(0)
-                    .getStringCellValue().equals("Итого начислений по абоненту с учётом округлений"))) {
+        for (int i = 7; i < myExcelSheet.getLastRowNum(); i++) {
+
+            XSSFRow row = myExcelSheet.getRow(i);
+
+            if ((row == null) || (row.getCell(0).getCellType() == CellType.BLANK)
+                    || (row.getCell(0).getStringCellValue().equals("Итого начислений по абоненту"))
+                    || (row.getCell(0).getStringCellValue()
+                    .equals("Итого начислений по абоненту с учётом округлений"))) {
                 continue;
             } else if (row.getCell(0).getStringCellValue().equals("Абонент: ")) {
                 ownerNumberTemp = row.getCell(1).getStringCellValue();
@@ -69,8 +72,6 @@ public class CallServiceImpl implements CallService {
             callService.setMonthly(true);
             calls.add(callService);
         }
-
-
         return calls;
     }
     //до это строки удалить
@@ -108,8 +109,7 @@ public class CallServiceImpl implements CallService {
         Call call = new Call();
         call.setOwnerNumber(row.getCell(0).getStringCellValue());
         call.setCallType(row.getCell(1).getStringCellValue());
-        call.setCallDateTime(LocalDateTime.parse(row.getCell(2)
-                .getStringCellValue().trim(), dateTimeFormatter));
+        call.setCallDateTime(LocalDateTime.parse(row.getCell(2).getStringCellValue().trim(), dateTimeFormatter));
         if (row.getCell(3).getCellType() == CellType.STRING) {
             call.setCode(row.getCell(3).getStringCellValue());
         } else {
