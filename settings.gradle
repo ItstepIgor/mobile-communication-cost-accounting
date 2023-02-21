@@ -1,4 +1,5 @@
 rootProject.name = 'mobile-communication-cost-accounting'
 includeBuild 'import-service'
 includeBuild 'config-service'
+includeBuild 'calculate-service'
 includeBuild 'gateway-service'

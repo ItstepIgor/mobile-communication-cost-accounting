@@ -12,6 +12,10 @@ spring:
           uri: lb://import-service
           predicates:
             - Path=/import/**
+        - id: calculate-service
+          uri: lb://calculate-service
+          predicates:
+            - Path=/calculate/**
     consul:
       host: ${CONSUL_HOST:localhost}
       port: ${CONSUL_PORT:8500}

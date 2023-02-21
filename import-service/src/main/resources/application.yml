@@ -3,7 +3,3 @@ spring:
     name: import-service
   config:
     import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:8888}
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB

@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8083
 spring:
   cloud:
     consul:
@@ -8,14 +8,10 @@ spring:
       discovery:
         instanceId: ${spring.application.name}:${random.value}
   datasource:
-    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost:5433}/${POSTGRES_DB_NAME:import_db}
+    url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost:5434}/${POSTGRES_DB_NAME:calculate_db}
     username: ${POSTGRES_USERNAME:postgres}
     password: ${POSTGRES_PASSWORD:sa}
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
 #    show-sql: true
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 20MB
