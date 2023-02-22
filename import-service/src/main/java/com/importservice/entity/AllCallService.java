@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Builder
 @Entity
 @Table(name = "call_service")
-public class ImportCallService {
+public class AllCallService {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,5 +38,5 @@ public class ImportCallService {
     private BigDecimal sum;
 
     @Column(nullable = false)
-    private Boolean monthly;
+    private Boolean oneTimeCallService;
 }

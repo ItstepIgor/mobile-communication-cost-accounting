@@ -9,4 +9,6 @@ springdoc:
     urls:
       - name: import-service
         url: /import-service/v3/api-docs
+      - name: calculate-service
+        url: /calculate-service/v3/api-docs
 

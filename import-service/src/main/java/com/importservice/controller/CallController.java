@@ -1,9 +1,13 @@
 package com.importservice.controller;
 
+import com.importservice.dto.AllCallServiceDTO;
 import com.importservice.service.CallService;
+import com.importservice.service.AllCallServiceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -11,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class CallController {
 
     private final CallService callService;
+    private final AllCallServiceService allCallServiceService;
 
     @CrossOrigin
     @GetMapping("/check")
@@ -23,12 +28,18 @@ public class CallController {
     @GetMapping("/uploadfromharddisk")
     public void create() {
         String file = "e:\\1\\01.2023.xlsx";
-        callService.createFromFile(file);
+        allCallServiceService.createFromFile(file);
     }
     //до это строки удалить
 
     @PostMapping("/upload")
     public void uploadFile(@RequestParam("file") MultipartFile file) {
-                callService.create(file);
+        callService.create(file);
+    }
+
+
+    @PostMapping("/service")
+    public List<AllCallServiceDTO> findAllCommonCallService() {
+        return allCallServiceService.findAll();
     }
 }

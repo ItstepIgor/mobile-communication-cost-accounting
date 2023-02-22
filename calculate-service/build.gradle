@@ -30,7 +30,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation "org.liquibase:liquibase-core:${versions.liquibase}"
+	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${versions.openapi}"
 	implementation 'org.postgresql:postgresql'
 	implementation "org.projectlombok:lombok-mapstruct-binding:${versions.lmBinding}"
 	implementation "org.mapstruct:mapstruct:${versions.mapstruct}"
