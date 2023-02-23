@@ -1,27 +1,26 @@
 package com.calculateservice.service.impl;
 
 import com.calculateservice.dto.AllCallServiceDTO;
-import com.calculateservice.entity.MonthlyCallService;
-import com.calculateservice.entity.MonthlyCallServiceCost;
-import com.calculateservice.entity.OneTimeCallService;
+import com.calculateservice.entity.*;
 import com.calculateservice.repository.MonthlyCallServiceCostRepository;
 import com.calculateservice.repository.MonthlyCallServiceRepository;
 import com.calculateservice.repository.OneTimeCallServiceRepository;
-import com.calculateservice.service.CalculateService;
+import com.calculateservice.repository.PhoneNumberRepository;
+import com.calculateservice.service.FillingDataBaseService;
 import com.calculateservice.util.ImportFeignClients;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class CalculateServiceImpl implements CalculateService {
+public class FillingDataBaseServiceImpl implements FillingDataBaseService {
 
     private final ImportFeignClients importFeignClients;
 
@@ -30,13 +29,38 @@ public class CalculateServiceImpl implements CalculateService {
     private final MonthlyCallServiceRepository monthlyCallServiceRepository;
 
     private final MonthlyCallServiceCostRepository monthlyCallServiceCostRepository;
+    private final PhoneNumberRepository phoneNumberRepository;
 
 
-    public void createAllCallService() {
+    public void fillingDataBase() {
         List<AllCallServiceDTO> allCallServiceDTOS = findAllCommonCallService();
         createOneTimeCallServices(allCallServiceDTOS);
         List<MonthlyCallService> monthlyCallServices = createMonthlyCallService(allCallServiceDTOS);
         createMonthlyCallServiceCost(allCallServiceDTOS, monthlyCallServices);
+        createPhoneNumber(allCallServiceDTOS);
+    }
+
+    private void createPhoneNumber(List<AllCallServiceDTO> allCallServiceDTOS) {
+        Set<PhoneNumber> phoneNumbers = new HashSet<>();
+        List<PhoneNumber> allPhoneNumber = findAllPhoneNumber();
+
+        Set<Long> phoneNumberName = allPhoneNumber.stream()
+                .map(PhoneNumber::getNumber)
+                .collect(Collectors.toSet());
+
+        allCallServiceDTOS.stream()
+                .filter(allCallServiceDTO -> !phoneNumberName.contains(allCallServiceDTO.getNumber()))
+                .forEach(allCallServiceDTO -> {
+                    PhoneNumber phoneNumber = new PhoneNumber();
+                    phoneNumber.setNumber(allCallServiceDTO.getNumber());
+                    phoneNumber.setGroupNumber(GroupNumber.builder()
+                            .id(7)
+                            .groupNumberName("Общая группа")
+                            .build());
+                    phoneNumbers.add(phoneNumber);
+                });
+
+        phoneNumberRepository.saveAll(phoneNumbers);
     }
 
 
@@ -45,17 +69,30 @@ public class CalculateServiceImpl implements CalculateService {
         List<MonthlyCallServiceCost> monthlyCallServiceCosts = new ArrayList<>();
         for (MonthlyCallService monthlyCallService : monthlyCallServices) {
             String monthlyCallServiceName = monthlyCallService.getMonthlyCallServiceName();
-            MonthlyCallServiceCost monthlyCallServiceCost = new MonthlyCallServiceCost();
-            for (AllCallServiceDTO allCallServiceDTO : allCallServiceDTOS) {
-                if (allCallServiceDTO.getCallServiceName().equals(monthlyCallServiceName)) {
+
+            List<AllCallServiceDTO> tempCallServiceDTOS = allCallServiceDTOS
+                    .stream()
+                    .filter(allCallServiceDTO -> allCallServiceDTO
+                            .getCallServiceName().equals(monthlyCallServiceName))
+                    .filter(distinctByKey(AllCallServiceDTO::getSum))
+                    .toList();
+
+            for (AllCallServiceDTO allCallServiceDTO : tempCallServiceDTOS) {
+                MonthlyCallServiceCost monthlyCallServiceCost = new MonthlyCallServiceCost();
                     monthlyCallServiceCost.setMonthlyCallService(monthlyCallService);
                     monthlyCallServiceCost.setSum(allCallServiceDTO.getSum());
                     monthlyCallServiceCost.setDateSumStart(LocalDate.now());
-                }
+                monthlyCallServiceCosts.add(monthlyCallServiceCost);
             }
-            monthlyCallServiceCosts.add(monthlyCallServiceCost);
         }
         monthlyCallServiceCostRepository.saveAll(monthlyCallServiceCosts);
+    }
+
+    public static <T> Predicate<T> distinctByKey(
+            Function<? super T, ?> keyExtractor) {
+
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     private List<MonthlyCallService> createMonthlyCallService(List<AllCallServiceDTO> allCallServiceDTOS) {
@@ -110,5 +147,10 @@ public class CalculateServiceImpl implements CalculateService {
     public List<MonthlyCallService> findAllMonthlyCallService() {
 
         return monthlyCallServiceRepository.findAll();
+    }
+
+    public List<PhoneNumber> findAllPhoneNumber() {
+
+        return phoneNumberRepository.findAll();
     }
 }

@@ -1,10 +1,7 @@
 package com.calculateservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,9 +9,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString(exclude = {"monthlyCallServiceCosts"})
 @Entity
 public class MonthlyCallService {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -23,6 +20,7 @@ public class MonthlyCallService {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "monthlyCallService")
     List<MonthlyCallServiceCost> monthlyCallServiceCosts;
+
 
 
 }
