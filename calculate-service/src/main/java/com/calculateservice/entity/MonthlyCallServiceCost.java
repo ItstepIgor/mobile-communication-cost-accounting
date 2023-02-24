@@ -14,6 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Entity
+@Table(name = "monthly_call_service_cost")
 public class MonthlyCallServiceCost {
 
     @Id

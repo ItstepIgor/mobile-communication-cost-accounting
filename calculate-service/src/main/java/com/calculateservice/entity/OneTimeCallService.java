@@ -1,14 +1,14 @@
 package com.calculateservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"ruleOneTimeCallServices"})
 @Builder
 @Entity
 public class OneTimeCallService {
@@ -18,4 +18,7 @@ public class OneTimeCallService {
     private long id;
     @Column(nullable = false)
     private String oneTimeCallServiceName;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "oneTimeCallService")
+    List<RuleOneTimeCallService> ruleOneTimeCallServices;
 }
