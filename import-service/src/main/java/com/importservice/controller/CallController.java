@@ -4,6 +4,7 @@ import com.importservice.dto.AllCallServiceDTO;
 import com.importservice.service.CallService;
 import com.importservice.service.AllCallServiceService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,13 +33,13 @@ public class CallController {
     }
     //до это строки удалить
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadFile(@RequestParam("file") MultipartFile file) {
         callService.create(file);
     }
 
-
-    @PostMapping("/service")
+    @CrossOrigin
+    @GetMapping("/service")
     public List<AllCallServiceDTO> findAllCommonCallService() {
         return allCallServiceService.findAll();
     }
