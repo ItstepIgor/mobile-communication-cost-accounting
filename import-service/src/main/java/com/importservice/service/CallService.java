@@ -7,8 +7,8 @@ import java.util.Set;
 public interface CallService {
 
 
-    void create(MultipartFile file);
+    void createCall(MultipartFile file);
 
 
-    Set<String> findAllByCallType();
+    Set<String> findAllByCallService();
 }

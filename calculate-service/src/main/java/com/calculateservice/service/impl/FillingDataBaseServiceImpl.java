@@ -40,80 +40,6 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
         createPhoneNumber(allCallServiceDTOS);
     }
 
-    private void createPhoneNumber(List<AllCallServiceDTO> allCallServiceDTOS) {
-        Set<PhoneNumber> phoneNumbers = new HashSet<>();
-        List<PhoneNumber> allPhoneNumber = findAllPhoneNumber();
-
-        Set<Long> phoneNumberName = allPhoneNumber.stream()
-                .map(PhoneNumber::getNumber)
-                .collect(Collectors.toSet());
-
-        allCallServiceDTOS.stream()
-                .filter(allCallServiceDTO -> !phoneNumberName.contains(allCallServiceDTO.getNumber()))
-                .forEach(allCallServiceDTO -> {
-                    PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setNumber(allCallServiceDTO.getNumber());
-                    phoneNumber.setGroupNumber(GroupNumber.builder()
-                            .id(7)
-                            .groupNumberName("Общая группа")
-                            .build());
-                    phoneNumbers.add(phoneNumber);
-                });
-
-        phoneNumberRepository.saveAll(phoneNumbers);
-    }
-
-
-    private void createMonthlyCallServiceCost(List<AllCallServiceDTO> allCallServiceDTOS,
-                                              List<MonthlyCallService> monthlyCallServices) {
-        List<MonthlyCallServiceCost> monthlyCallServiceCosts = new ArrayList<>();
-        for (MonthlyCallService monthlyCallService : monthlyCallServices) {
-            String monthlyCallServiceName = monthlyCallService.getMonthlyCallServiceName();
-
-            List<AllCallServiceDTO> tempCallServiceDTOS = allCallServiceDTOS
-                    .stream()
-                    .filter(allCallServiceDTO -> allCallServiceDTO
-                            .getCallServiceName().equals(monthlyCallServiceName))
-                    .filter(distinctByKey(AllCallServiceDTO::getSum))
-                    .toList();
-
-            for (AllCallServiceDTO allCallServiceDTO : tempCallServiceDTOS) {
-                MonthlyCallServiceCost monthlyCallServiceCost = new MonthlyCallServiceCost();
-                    monthlyCallServiceCost.setMonthlyCallService(monthlyCallService);
-                    monthlyCallServiceCost.setSum(allCallServiceDTO.getSum());
-                    monthlyCallServiceCost.setDateSumStart(LocalDate.now());
-                monthlyCallServiceCosts.add(monthlyCallServiceCost);
-            }
-        }
-        monthlyCallServiceCostRepository.saveAll(monthlyCallServiceCosts);
-    }
-
-    public static <T> Predicate<T> distinctByKey(
-            Function<? super T, ?> keyExtractor) {
-
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
-
-    private List<MonthlyCallService> createMonthlyCallService(List<AllCallServiceDTO> allCallServiceDTOS) {
-        Set<MonthlyCallService> monthlyCallServices = new HashSet<>();
-
-        List<MonthlyCallService> allMonthlyCallService = findAllMonthlyCallService();
-
-        Set<String> monthlyCallServiceName = allMonthlyCallService.stream()
-                .map(MonthlyCallService::getMonthlyCallServiceName)
-                .collect(Collectors.toSet());
-
-        allCallServiceDTOS.stream()
-                .filter(allCallServiceDTO -> !allCallServiceDTO.getOneTimeCallService())
-                .filter(allCallServiceDTO -> !monthlyCallServiceName.contains(allCallServiceDTO.getCallServiceName()))
-                .forEach(allCallServiceDTO -> {
-                    MonthlyCallService monthlyCallService = new MonthlyCallService();
-                    monthlyCallService.setMonthlyCallServiceName(allCallServiceDTO.getCallServiceName());
-                    monthlyCallServices.add(monthlyCallService);
-                });
-        return monthlyCallServiceRepository.saveAll(monthlyCallServices);
-    }
 
     private List<AllCallServiceDTO> findAllCommonCallService() {
         return importFeignClients.findAllCommonCallService().getBody();
@@ -144,9 +70,83 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
         return oneTimeCallServiceRepository.findAll();
     }
 
+    private List<MonthlyCallService> createMonthlyCallService(List<AllCallServiceDTO> allCallServiceDTOS) {
+        Set<MonthlyCallService> monthlyCallServices = new HashSet<>();
+
+        List<MonthlyCallService> allMonthlyCallService = findAllMonthlyCallService();
+
+        Set<String> monthlyCallServiceName = allMonthlyCallService.stream()
+                .map(MonthlyCallService::getMonthlyCallServiceName)
+                .collect(Collectors.toSet());
+
+        allCallServiceDTOS.stream()
+                .filter(allCallServiceDTO -> !allCallServiceDTO.getOneTimeCallService())
+                .filter(allCallServiceDTO -> !monthlyCallServiceName.contains(allCallServiceDTO.getCallServiceName()))
+                .forEach(allCallServiceDTO -> {
+                    MonthlyCallService monthlyCallService = new MonthlyCallService();
+                    monthlyCallService.setMonthlyCallServiceName(allCallServiceDTO.getCallServiceName());
+                    monthlyCallServices.add(monthlyCallService);
+                });
+        return monthlyCallServiceRepository.saveAll(monthlyCallServices);
+    }
+
     public List<MonthlyCallService> findAllMonthlyCallService() {
 
         return monthlyCallServiceRepository.findAll();
+    }
+
+    private void createMonthlyCallServiceCost(List<AllCallServiceDTO> allCallServiceDTOS,
+                                              List<MonthlyCallService> monthlyCallServices) {
+        List<MonthlyCallServiceCost> monthlyCallServiceCosts = new ArrayList<>();
+        for (MonthlyCallService monthlyCallService : monthlyCallServices) {
+            String monthlyCallServiceName = monthlyCallService.getMonthlyCallServiceName();
+
+            List<AllCallServiceDTO> tempCallServiceDTOS = allCallServiceDTOS
+                    .stream()
+                    .filter(allCallServiceDTO -> allCallServiceDTO
+                            .getCallServiceName().equals(monthlyCallServiceName))
+                    .filter(distinctByKey(AllCallServiceDTO::getSum))
+                    .toList();
+
+            for (AllCallServiceDTO allCallServiceDTO : tempCallServiceDTOS) {
+                MonthlyCallServiceCost monthlyCallServiceCost = new MonthlyCallServiceCost();
+                monthlyCallServiceCost.setMonthlyCallService(monthlyCallService);
+                monthlyCallServiceCost.setSum(allCallServiceDTO.getSum());
+                monthlyCallServiceCost.setDateSumStart(LocalDate.now());
+                monthlyCallServiceCosts.add(monthlyCallServiceCost);
+            }
+        }
+        monthlyCallServiceCostRepository.saveAll(monthlyCallServiceCosts);
+    }
+
+    public static <T> Predicate<T> distinctByKey(
+            Function<? super T, ?> keyExtractor) {
+
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    private void createPhoneNumber(List<AllCallServiceDTO> allCallServiceDTOS) {
+        Set<PhoneNumber> phoneNumbers = new HashSet<>();
+        List<PhoneNumber> allPhoneNumber = findAllPhoneNumber();
+
+        Set<Long> phoneNumberName = allPhoneNumber.stream()
+                .map(PhoneNumber::getNumber)
+                .collect(Collectors.toSet());
+
+        allCallServiceDTOS.stream()
+                .filter(allCallServiceDTO -> !phoneNumberName.contains(allCallServiceDTO.getNumber()))
+                .forEach(allCallServiceDTO -> {
+                    PhoneNumber phoneNumber = new PhoneNumber();
+                    phoneNumber.setNumber(allCallServiceDTO.getNumber());
+                    phoneNumber.setGroupNumber(GroupNumber.builder()
+                            .id(7)
+                            .groupNumberName("Общая группа")
+                            .build());
+                    phoneNumbers.add(phoneNumber);
+                });
+
+        phoneNumberRepository.saveAll(phoneNumbers);
     }
 
     public List<PhoneNumber> findAllPhoneNumber() {

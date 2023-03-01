@@ -10,6 +10,6 @@ import java.util.Set;
 @Repository
 public interface CallRepository extends JpaRepository<Call, Long> {
 
-    @Query ("select distinct c.callType from Call c")
-    Set<String> findAllByCallType();
+    @Query ("select distinct c.callService from Call c")
+    Set<String> findAllByCallService();
 }

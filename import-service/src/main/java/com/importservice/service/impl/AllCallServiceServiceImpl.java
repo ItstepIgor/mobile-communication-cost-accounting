@@ -14,8 +14,8 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -37,19 +37,17 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
                 .listAllCallServiceToListAllCallServiceDto(allCallServiceRepository.findAll());
     }
 
-    //TODO Удалить после настройки импорта
     @SneakyThrows
     @Transactional
-    public void createFromFile(String file) {
+    public void createCallService(MultipartFile file) {
         System.out.println(LocalDateTime.now());
-        XSSFWorkbook myExcelBook = new XSSFWorkbook(new FileInputStream(file));
+        XSSFWorkbook myExcelBook = new XSSFWorkbook(file.getInputStream());
         allCallServiceRepository.saveAll(readServiceFromExcel(myExcelBook));
     }
-    //до это строки удалить
 
     private List<AllCallService> readServiceFromExcel(XSSFWorkbook myExcelBook) {
         List<AllCallService> calls = new ArrayList<>();
-        Set<String> callType = findAllCallServiceName();
+        Set<String> callService = findAllCallServiceName();
         XSSFSheet myExcelSheet = myExcelBook.getSheet("Page4");
         String ownerNumberTemp = null;
 
@@ -66,31 +64,28 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
                 ownerNumberTemp = row.getCell(1).getStringCellValue();
                 continue;
             }
-            calls.add(fillingCommonCallService(callType, ownerNumberTemp, row));
+            calls.add(fillingCommonCallService(callService, ownerNumberTemp, row));
         }
         return calls;
     }
 
     private Set<String> findAllCallServiceName() {
-        return callService.findAllByCallType();
+        return callService.findAllByCallService();
     }
 
-
-    private AllCallService fillingCommonCallService(Set<String> callType, String ownerNumberTemp, XSSFRow row) {
-        AllCallService callService = new AllCallService();
-        callService.setOwnerNumber(ownerNumberTemp);
-        callService.setCallServiceName(row.getCell(0).getStringCellValue());
+    private AllCallService fillingCommonCallService(Set<String> callService, String ownerNumberTemp, XSSFRow row) {
+        AllCallService allCallService = new AllCallService();
+        allCallService.setOwnerNumber(ownerNumberTemp);
+        allCallService.setCallServiceName(row.getCell(0).getStringCellValue());
         if (row.getCell(2).getCellType() == CellType.STRING) {
-            callService.setCallTime(row.getCell(2).getStringCellValue());
+            allCallService.setCallTime(row.getCell(2).getStringCellValue());
         } else {
-            callService.setCallTime(String.valueOf(row.getCell(2).getNumericCellValue()));
+            allCallService.setCallTime(String.valueOf(row.getCell(2).getNumericCellValue()));
         }
-        callService.setVatTax(row.getCell(4).getStringCellValue());
-        callService.setNumber(Long.parseLong(ownerNumberTemp.substring(ownerNumberTemp.length() - 9)));
-        callService.setSum(BigDecimal.valueOf(row.getCell(3).getNumericCellValue()));
-        callService.setOneTimeCallService(callType.contains(callService.getCallServiceName()));
-        return callService;
+        allCallService.setVatTax(row.getCell(4).getStringCellValue());
+        allCallService.setNumber(Long.parseLong(ownerNumberTemp.substring(ownerNumberTemp.length() - 9)));
+        allCallService.setSum(BigDecimal.valueOf(row.getCell(3).getNumericCellValue()));
+        allCallService.setOneTimeCallService(callService.contains(allCallService.getCallServiceName()));
+        return allCallService;
     }
-
-
 }

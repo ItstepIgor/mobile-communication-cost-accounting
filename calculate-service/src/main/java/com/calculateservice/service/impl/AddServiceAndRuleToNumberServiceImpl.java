@@ -2,13 +2,13 @@ package com.calculateservice.service.impl;
 
 import com.calculateservice.entity.*;
 import com.calculateservice.repository.*;
-import com.calculateservice.service.PhoneNumberService;
+import com.calculateservice.service.AddServiceAndRuleToNumberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PhoneNumberServiceImpl implements PhoneNumberService {
+public class AddServiceAndRuleToNumberServiceImpl implements AddServiceAndRuleToNumberService {
 
     private final GroupNumberRepository groupNumberRepository;
 

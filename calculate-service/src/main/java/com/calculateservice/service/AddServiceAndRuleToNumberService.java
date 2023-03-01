@@ -1,6 +1,6 @@
 package com.calculateservice.service;
 
-public interface PhoneNumberService {
+public interface AddServiceAndRuleToNumberService {
 
     void addRuleToNumber();
     void addMonthlyCallServiceToNumber();

@@ -24,7 +24,7 @@ public class Call {
     private String ownerNumber;
 
     @Column(nullable = false)
-    private String callType;
+    private String callService;
 
     @Column(nullable = false)
     private LocalDateTime callDateTime;
