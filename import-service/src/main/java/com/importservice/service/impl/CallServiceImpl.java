@@ -1,7 +1,9 @@
 package com.importservice.service.impl;
 
 import com.importservice.entity.Call;
+import com.importservice.entity.OneTimeCallService;
 import com.importservice.reposiitory.CallRepository;
+import com.importservice.reposiitory.OneTimeCallServiceRepository;
 import com.importservice.service.CallService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,8 @@ public class CallServiceImpl implements CallService {
 
     private final CallRepository callRepository;
 
+    private final OneTimeCallServiceRepository oneTimeCallServiceRepository;
+
 
     @Override
     @Transactional
@@ -35,7 +40,28 @@ public class CallServiceImpl implements CallService {
     public void createCall(MultipartFile file) {
         System.out.println(LocalDateTime.now());
         XSSFWorkbook myExcelBook = new XSSFWorkbook(file.getInputStream());
-        callRepository.saveAll(readFromExcelSeveralPage(myExcelBook));
+        List<Call> calls = readFromExcelSeveralPage(myExcelBook);
+        saveOneTimeCallService(calls);
+        saveCall(calls);
+
+//        callRepository.saveAll();
+    }
+
+    private void saveOneTimeCallService(List<Call> calls) {
+        Set<OneTimeCallService> oneTimeCallServices = calls.stream()
+                .map(Call::getCallService)
+                .distinct()
+                .map(OneTimeCallService::new)
+                .collect(Collectors.toSet());
+        oneTimeCallServiceRepository.saveAll(oneTimeCallServices);
+    }
+
+    private void saveCall(List<Call> calls) {
+        List<Call> callList = calls.stream()
+                .filter(call -> !(call.getSum().equals(BigDecimal.valueOf(0.0))))
+                .toList();
+
+        callRepository.saveAll(callList);
     }
 
     @Override
@@ -54,21 +80,22 @@ public class CallServiceImpl implements CallService {
             if (myExcelSheet.getSheetName().contains("CallDetails")) {
                 for (int j = 5; j < myExcelSheet.getLastRowNum(); j++) {
                     XSSFRow row = myExcelSheet.getRow(j);
-                    if ((row != null) && (row.getCell(0).getCellType() != CellType.BLANK)
-                            && (!row.getCell(0).getStringCellValue().equals("Дата"))
-                            && (!row.getCell(0).getStringCellValue().equals("Итого"))
-                            && (!row.getCell(0).getStringCellValue().equals("Дата и время начала соединения"))
-                            && (!row.getCell(0).getStringCellValue().equals("Итого для абонента"))) {
-                        if (row.getCell(0).getStringCellValue().equals("Абонент: ")) {
-                            ownerNumberTemp = row.getCell(1).getStringCellValue();
-                        } else if ((row.getCell(0).getCellType() == CellType.STRING)
-                                && ((row.getCell(2) == null)
-                                || (row.getCell(2).getCellType() == CellType.BLANK))) {
-                            callService = row.getCell(0).getStringCellValue();
-                        } else if (row.getCell(4).getNumericCellValue() != 0) {
-                            calls.add(fillingCallSeveralPage(ownerNumberTemp, callService, row));
-                        }
+                    if ((row == null) || (row.getCell(0).getCellType() == CellType.BLANK)
+                            || (row.getCell(0).getStringCellValue().equals("Дата"))
+                            || (row.getCell(0).getStringCellValue().equals("Итого"))
+                            || (row.getCell(0).getStringCellValue().equals("Дата и время начала соединения"))
+                            || (row.getCell(0).getStringCellValue().equals("Итого для абонента"))) {
+                        continue;
+                    } else if (row.getCell(0).getStringCellValue().equals("Абонент: ")) {
+                        ownerNumberTemp = row.getCell(1).getStringCellValue();
+                        continue;
+                    } else if ((row.getCell(0).getCellType() == CellType.STRING)
+                            && ((row.getCell(2) == null)
+                            || (row.getCell(2).getCellType() == CellType.BLANK))) {
+                        callService = row.getCell(0).getStringCellValue();
+                        continue;
                     }
+                    calls.add(fillingCallSeveralPage(ownerNumberTemp, callService, row));
                 }
             }
         }
