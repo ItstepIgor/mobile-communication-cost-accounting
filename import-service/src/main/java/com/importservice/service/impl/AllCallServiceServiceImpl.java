@@ -3,8 +3,8 @@ package com.importservice.service.impl;
 import com.importservice.dto.AllCallServiceDTO;
 import com.importservice.entity.AllCallService;
 import com.importservice.reposiitory.AllCallServiceRepository;
-import com.importservice.service.CallService;
 import com.importservice.service.AllCallServiceService;
+import com.importservice.service.OneTimeCallServiceService;
 import com.importservice.service.mapper.AllCallServiceListMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -29,7 +31,8 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
     private final AllCallServiceRepository allCallServiceRepository;
 
     private final AllCallServiceListMapper allCallServiceListMapper;
-    private final CallService callService;
+
+    private final OneTimeCallServiceService oneTimeCallServiceService;
 
     @Override
     public List<AllCallServiceDTO> findAll() {
@@ -49,6 +52,10 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
         List<AllCallService> calls = new ArrayList<>();
         Set<String> callService = findAllCallServiceName();
         XSSFSheet myExcelSheet = myExcelBook.getSheet("Page4");
+        XSSFRow xssfRow = myExcelSheet.getRow(4);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate invoiceDate = LocalDate.parse(xssfRow.getCell(1)
+                .getStringCellValue().substring(0, 10), dateTimeFormatter);
         String ownerNumberTemp = null;
 
         for (int i = 7; i < myExcelSheet.getLastRowNum(); i++) {
@@ -64,16 +71,16 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
                 ownerNumberTemp = row.getCell(1).getStringCellValue();
                 continue;
             }
-            calls.add(fillingCommonCallService(callService, ownerNumberTemp, row));
+            calls.add(fillingCommonCallService(callService, ownerNumberTemp, row, invoiceDate));
         }
         return calls;
     }
 
     private Set<String> findAllCallServiceName() {
-        return callService.findAllByCallService();
+        return oneTimeCallServiceService.findOneTimeCallServiceName();
     }
 
-    private AllCallService fillingCommonCallService(Set<String> callService, String ownerNumberTemp, XSSFRow row) {
+    private AllCallService fillingCommonCallService(Set<String> callService, String ownerNumberTemp, XSSFRow row, LocalDate invoiceDate) {
         AllCallService allCallService = new AllCallService();
         allCallService.setOwnerNumber(ownerNumberTemp);
         allCallService.setCallServiceName(row.getCell(0).getStringCellValue());
@@ -83,6 +90,7 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
             allCallService.setCallTime(String.valueOf(row.getCell(2).getNumericCellValue()));
         }
         allCallService.setVatTax(row.getCell(4).getStringCellValue());
+        allCallService.setInvoiceDate(invoiceDate);
         allCallService.setNumber(Long.parseLong(ownerNumberTemp.substring(ownerNumberTemp.length() - 9)));
         allCallService.setSum(BigDecimal.valueOf(row.getCell(3).getNumericCellValue()));
         allCallService.setOneTimeCallService(callService.contains(allCallService.getCallServiceName()));

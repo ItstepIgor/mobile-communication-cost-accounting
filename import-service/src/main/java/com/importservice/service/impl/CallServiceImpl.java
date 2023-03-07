@@ -1,10 +1,10 @@
 package com.importservice.service.impl;
 
 import com.importservice.entity.Call;
-import com.importservice.entity.OneTimeCallService;
 import com.importservice.reposiitory.CallRepository;
-import com.importservice.reposiitory.OneTimeCallServiceRepository;
 import com.importservice.service.CallService;
+import com.importservice.service.ImportPeriodService;
+import com.importservice.service.OneTimeCallServiceService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -21,8 +21,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +29,9 @@ public class CallServiceImpl implements CallService {
 
     private final CallRepository callRepository;
 
-    private final OneTimeCallServiceRepository oneTimeCallServiceRepository;
+    private final OneTimeCallServiceService oneTimeCallServiceService;
+
+    private final ImportPeriodService importPeriodService;
 
 
     @Override
@@ -40,20 +40,10 @@ public class CallServiceImpl implements CallService {
     public void createCall(MultipartFile file) {
         System.out.println(LocalDateTime.now());
         XSSFWorkbook myExcelBook = new XSSFWorkbook(file.getInputStream());
+        importPeriodService.saveImportPeriod(myExcelBook);
         List<Call> calls = readFromExcelSeveralPage(myExcelBook);
-        saveOneTimeCallService(calls);
+        oneTimeCallServiceService.saveOneTimeCallService(calls);
         saveCall(calls);
-
-//        callRepository.saveAll();
-    }
-
-    private void saveOneTimeCallService(List<Call> calls) {
-        Set<OneTimeCallService> oneTimeCallServices = calls.stream()
-                .map(Call::getCallService)
-                .distinct()
-                .map(OneTimeCallService::new)
-                .collect(Collectors.toSet());
-        oneTimeCallServiceRepository.saveAll(oneTimeCallServices);
     }
 
     private void saveCall(List<Call> calls) {
@@ -64,10 +54,6 @@ public class CallServiceImpl implements CallService {
         callRepository.saveAll(callList);
     }
 
-    @Override
-    public Set<String> findAllByCallService() {
-        return callRepository.findAllByCallService();
-    }
 
     @SneakyThrows
     private List<Call> readFromExcelSeveralPage(XSSFWorkbook myExcelBook) {

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -30,6 +31,9 @@ public class AllCallService {
 
     @Column(nullable = false)
     private String vatTax;
+
+    @Column(nullable = false)
+    private LocalDate invoiceDate;
 
     @Column(nullable = false)
     private long number;
