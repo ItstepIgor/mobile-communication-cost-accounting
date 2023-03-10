@@ -3,6 +3,7 @@ package com.calculateservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,9 @@ public class PhoneNumber {
     private long id;
     @Column(nullable = false)
     private long number;
+
+    @Column(nullable = false)
+    private LocalDateTime creationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_number_id", nullable = false)

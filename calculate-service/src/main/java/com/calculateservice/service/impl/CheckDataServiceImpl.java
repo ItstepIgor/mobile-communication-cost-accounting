@@ -10,6 +10,7 @@ import com.calculateservice.util.ImportFeignClients;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -26,8 +27,8 @@ public class CheckDataServiceImpl implements CheckDataService {
     private final MonthlyCallServiceCostRepository monthlyCallServiceCostRepository;
 
     @Override
-    public List<AllCallServiceDTO> checkSumMonthlyCallService() {
-        List<AllCallServiceDTO> allCallServiceDTOS = findAllCommonCallService();
+    public List<AllCallServiceDTO> checkSumMonthlyCallService(LocalDate date) {
+        List<AllCallServiceDTO> allCallServiceDTOS = findAllCommonCallService(date);
         List<MonthlyCallService> monthlyCallServices = findAllMonthlyCallService();
 
         return checkSumMonthlyCallServiceCost(allCallServiceDTOS, monthlyCallServices);
@@ -60,8 +61,8 @@ public class CheckDataServiceImpl implements CheckDataService {
     }
 
 
-    private List<AllCallServiceDTO> findAllCommonCallService() {
-        return importFeignClients.findAllCommonCallService().getBody();
+    private List<AllCallServiceDTO> findAllCommonCallService(LocalDate date) {
+        return importFeignClients.findAllCommonCallService(date).getBody();
     }
 
     private List<MonthlyCallService> findAllMonthlyCallService() {

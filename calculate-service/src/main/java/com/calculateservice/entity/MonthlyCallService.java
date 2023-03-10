@@ -3,6 +3,7 @@ package com.calculateservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,6 +20,9 @@ public class MonthlyCallService {
     private long id;
     @Column(nullable = false)
     private String monthlyCallServiceName;
+
+    @Column(nullable = false)
+    private LocalDateTime creationDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "monthlyCallService")
     List<MonthlyCallServiceCost> monthlyCallServiceCosts;

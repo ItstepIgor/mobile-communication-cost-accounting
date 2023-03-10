@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -32,8 +33,8 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
     private final PhoneNumberRepository phoneNumberRepository;
 
 
-    public void fillingDataBase() {
-        List<AllCallServiceDTO> allCallServiceDTOS = findAllCommonCallService();
+    public void fillingDataBase(LocalDate date) {
+        List<AllCallServiceDTO> allCallServiceDTOS = findAllCommonCallService(date);
         createOneTimeCallServices(allCallServiceDTOS);
         List<MonthlyCallService> monthlyCallServices = createMonthlyCallService(allCallServiceDTOS);
         createMonthlyCallServiceCost(allCallServiceDTOS, monthlyCallServices);
@@ -41,8 +42,8 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
     }
 
 
-    private List<AllCallServiceDTO> findAllCommonCallService() {
-        return importFeignClients.findAllCommonCallService().getBody();
+    private List<AllCallServiceDTO> findAllCommonCallService(LocalDate date) {
+        return importFeignClients.findAllCommonCallService(date).getBody();
     }
 
     private void createOneTimeCallServices(List<AllCallServiceDTO> allCallServiceDTOS) {
@@ -59,6 +60,7 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .forEach(allCallServiceDTO -> {
                     OneTimeCallService oneTimeCallService = new OneTimeCallService();
                     oneTimeCallService.setOneTimeCallServiceName(allCallServiceDTO.getCallServiceName());
+                    oneTimeCallService.setCreationDate(LocalDateTime.now());
                     oneTimeCallServices.add(oneTimeCallService);
                 });
 
@@ -85,6 +87,7 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .forEach(allCallServiceDTO -> {
                     MonthlyCallService monthlyCallService = new MonthlyCallService();
                     monthlyCallService.setMonthlyCallServiceName(allCallServiceDTO.getCallServiceName());
+                    monthlyCallService.setCreationDate(LocalDateTime.now());
                     monthlyCallServices.add(monthlyCallService);
                 });
         return monthlyCallServiceRepository.saveAll(monthlyCallServices);
@@ -139,6 +142,7 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .forEach(allCallServiceDTO -> {
                     PhoneNumber phoneNumber = new PhoneNumber();
                     phoneNumber.setNumber(allCallServiceDTO.getNumber());
+                    phoneNumber.setCreationDate(LocalDateTime.now());
                     phoneNumber.setGroupNumber(GroupNumber.builder()
                             .id(7)
                             .groupNumberName("Общая группа")

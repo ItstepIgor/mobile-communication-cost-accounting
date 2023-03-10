@@ -7,10 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -45,7 +47,10 @@ public class CallController {
             description = "Получение информации по всем сервисам из БД "
     )
     @GetMapping("/service")
-    public List<AllCallServiceDTO> findAllCommonCallService() {
-        return allCallServiceService.findAll();
+    public List<AllCallServiceDTO> findAllCommonCallService(@RequestParam(value = "date")
+                                                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
+                                                                    fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
+                                                            LocalDate date) {
+        return allCallServiceService.findAllByDate(date);
     }
 }

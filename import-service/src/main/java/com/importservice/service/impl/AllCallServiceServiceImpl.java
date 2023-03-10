@@ -35,9 +35,9 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
     private final OneTimeCallServiceService oneTimeCallServiceService;
 
     @Override
-    public List<AllCallServiceDTO> findAll() {
+    public List<AllCallServiceDTO> findAllByDate(LocalDate date) {
         return allCallServiceListMapper
-                .listAllCallServiceToListAllCallServiceDto(allCallServiceRepository.findAll());
+                .listAllCallServiceToListAllCallServiceDto(allCallServiceRepository.getAllCallServicesByDate(date));
     }
 
     @SneakyThrows
