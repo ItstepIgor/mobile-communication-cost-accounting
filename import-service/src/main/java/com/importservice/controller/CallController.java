@@ -3,6 +3,7 @@ package com.importservice.controller;
 import com.importservice.dto.AllCallServiceDTO;
 import com.importservice.service.CallService;
 import com.importservice.service.AllCallServiceService;
+import com.importservice.service.CallServiceMTS;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,7 @@ import java.util.List;
 public class CallController {
 
     private final CallService callService;
+    private final CallServiceMTS callServiceMTS;
     private final AllCallServiceService allCallServiceService;
 
     @GetMapping("/check")
@@ -53,4 +55,10 @@ public class CallController {
                                                             LocalDate date) {
         return allCallServiceService.findAllByDate(date);
     }
+
+    @GetMapping("/importmts")
+    public void importMTS() {
+        callServiceMTS.createCall();
+    }
+
 }
