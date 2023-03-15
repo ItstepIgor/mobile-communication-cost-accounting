@@ -6,11 +6,14 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import net.sf.sevenzipjbinding.*;
+import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
+import net.sf.sevenzipjbinding.simple.ISimpleInArchive;
+import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,14 +22,24 @@ public class CallServiceMTSImpl implements CallServiceMTS {
     @Override
     @SneakyThrows
     public void createCall() {
-        String body;
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(checkForUtf8BOM(Files.newInputStream(Path.of("./MTS4.xml")))))) {
-            body = br.lines().collect(Collectors.joining());
+
+        List<InputStream> extract = extract("./MTS_207306892385_202302_9092867848.rar");
+        extract.set(0, checkForUtf8BOM(extract.get(0)));
+        StringBuilder stringBuilder = new StringBuilder();
+        for (InputStream inputStream1 : extract) {
+            String body;
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream1))) {
+                System.out.println();
+                body = br.lines().collect(Collectors.joining());
+                stringBuilder.append(body);
+            }
         }
-        StringReader reader = new StringReader(body);
+
+        StringReader reader = new StringReader(stringBuilder.toString());
         JAXBContext context = JAXBContext.newInstance(ReportMTS.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         ReportMTS reportMTS = (ReportMTS) unmarshaller.unmarshal(reader);
+
         System.out.println();
     }
 
@@ -41,5 +54,32 @@ public class CallServiceMTSImpl implements CallServiceMTS {
             }
         }
         return pushbackInputStream;
+    }
+
+    //извлечение из файла из архива
+    public List<InputStream> extract(String filePath) throws IOException {
+
+        RandomAccessFile randomAccessFile = new RandomAccessFile(filePath, "r");
+        RandomAccessFileInStream randomAccessFileStream = new RandomAccessFileInStream(randomAccessFile);
+        IInArchive inArchive = SevenZip.openInArchive(null, randomAccessFileStream);
+        ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
+        final List<InputStream> inputStreamList = new ArrayList<>();
+        for (ISimpleInArchiveItem item : simpleInArchive.getArchiveItems()) {
+            if (!item.isFolder()) {
+                ExtractOperationResult result;
+                result = item.extractSlow(data -> {
+                    InputStream is = new ByteArrayInputStream(data);
+                    BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
+                    inputStreamList.add(bufferedInputStream);
+                    return data.length;
+                });
+
+                if (result != ExtractOperationResult.OK) {
+                    throw new RuntimeException(
+                            String.format("Error extracting archive. Extracting error: %s", result));
+                }
+            }
+        }
+        return inputStreamList;
     }
 }

@@ -38,6 +38,8 @@ dependencies {
     implementation "org.mapstruct:mapstruct:${versions.mapstruct}"
     implementation "org.apache.poi:poi:${versions.poi}"
     implementation "org.apache.poi:poi-ooxml:${versions.poi}"
+    implementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
+    implementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
 
     compileOnly "org.projectlombok:lombok:${versions.lombok}"
     annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
