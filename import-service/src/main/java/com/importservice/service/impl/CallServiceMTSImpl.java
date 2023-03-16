@@ -11,8 +11,12 @@ import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchive;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,9 +25,9 @@ import java.util.stream.Collectors;
 public class CallServiceMTSImpl implements CallServiceMTS {
     @Override
     @SneakyThrows
-    public void createCall() {
+    public void createCall(MultipartFile file) {
 
-        List<InputStream> extract = extract("./MTS_207306892385_202302_9092867848.rar");
+        List<InputStream> extract = extract(file);
         extract.set(0, checkForUtf8BOM(extract.get(0)));
         StringBuilder stringBuilder = new StringBuilder();
         for (InputStream inputStream1 : extract) {
@@ -56,30 +60,39 @@ public class CallServiceMTSImpl implements CallServiceMTS {
         return pushbackInputStream;
     }
 
-    //извлечение из файла из архива
-    public List<InputStream> extract(String filePath) throws IOException {
+    //извлечение файла из архива
+    public List<InputStream> extract(MultipartFile file) throws IOException {
 
-        RandomAccessFile randomAccessFile = new RandomAccessFile(filePath, "r");
-        RandomAccessFileInStream randomAccessFileStream = new RandomAccessFileInStream(randomAccessFile);
-        IInArchive inArchive = SevenZip.openInArchive(null, randomAccessFileStream);
-        ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
+        Files.createDirectories(Path.of("./archive"));
+        Path filepath = Paths.get("./archive", file.getOriginalFilename());
         final List<InputStream> inputStreamList = new ArrayList<>();
-        for (ISimpleInArchiveItem item : simpleInArchive.getArchiveItems()) {
-            if (!item.isFolder()) {
-                ExtractOperationResult result;
-                result = item.extractSlow(data -> {
-                    InputStream is = new ByteArrayInputStream(data);
-                    BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
-                    inputStreamList.add(bufferedInputStream);
-                    return data.length;
-                });
 
-                if (result != ExtractOperationResult.OK) {
-                    throw new RuntimeException(
-                            String.format("Error extracting archive. Extracting error: %s", result));
+        try (OutputStream os = Files.newOutputStream(filepath)) {
+            os.write(file.getBytes());
+        }
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(filepath.toString(), "r")) {
+            RandomAccessFileInStream randomAccessFileStream = new RandomAccessFileInStream(randomAccessFile);
+
+            IInArchive inArchive = SevenZip.openInArchive(null, randomAccessFileStream);
+            ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
+            for (ISimpleInArchiveItem item : simpleInArchive.getArchiveItems()) {
+                if (!item.isFolder()) {
+                    ExtractOperationResult result;
+                    result = item.extractSlow(data -> {
+                        InputStream is = new ByteArrayInputStream(data);
+                        BufferedInputStream bufferedInputStream = new BufferedInputStream(is);
+                        inputStreamList.add(bufferedInputStream);
+                        return data.length;
+                    });
+
+                    if (result != ExtractOperationResult.OK) {
+                        throw new RuntimeException(
+                                String.format("Error extracting archive. Extracting error: %s", result));
+                    }
                 }
             }
         }
+        Files.delete(filepath);
         return inputStreamList;
     }
 }

@@ -39,7 +39,7 @@ public class CallController {
             description = "Вызывается метод заполнения данных по номерам телефонов и услугам"
     )
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void uploadFile(@RequestParam("file") @Parameter(description = "Файл excel имя файла file") MultipartFile file) {
+    public void uploadFile(@RequestParam("file") @Parameter(description = "Загружаем файл ZIP") MultipartFile file) {
         callService.createCall(file);
         allCallServiceService.createCallService(file);
     }
@@ -52,13 +52,13 @@ public class CallController {
     public List<AllCallServiceDTO> findAllCommonCallService(@RequestParam(value = "date")
                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                                     fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
+                                                            @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                                                             LocalDate date) {
         return allCallServiceService.findAllByDate(date);
     }
 
-    @GetMapping("/importmts")
-    public void importMTS() {
-        callServiceMTS.createCall();
+    @PostMapping(value = "/importmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void importMTS(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
+        callServiceMTS.createCall(file);
     }
-
 }

@@ -6,5 +6,5 @@ import org.springframework.web.multipart.MultipartFile;
 public interface CallServiceMTS {
 
 
-    void createCall();
+    void createCall(MultipartFile file);
 }
