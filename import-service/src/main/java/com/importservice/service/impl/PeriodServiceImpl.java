@@ -3,7 +3,7 @@ package com.importservice.service.impl;
 import com.importservice.entity.ImportPeriod;
 import com.importservice.exception.ImportException;
 import com.importservice.reposiitory.ImportPeriodRepository;
-import com.importservice.service.ImportPeriodService;
+import com.importservice.service.PeriodService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -15,7 +15,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
-public class ImportPeriodServiceImpl implements ImportPeriodService {
+public class PeriodServiceImpl implements PeriodService {
 
     private final ImportPeriodRepository importPeriodRepository;
 

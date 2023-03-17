@@ -14,7 +14,6 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,9 +41,8 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
 
     @SneakyThrows
     @Transactional
-    public void createCallService(MultipartFile file) {
+    public void createCallService(XSSFWorkbook myExcelBook) {
         System.out.println(LocalDateTime.now());
-        XSSFWorkbook myExcelBook = new XSSFWorkbook(file.getInputStream());
         allCallServiceRepository.saveAll(readServiceFromExcel(myExcelBook));
     }
 

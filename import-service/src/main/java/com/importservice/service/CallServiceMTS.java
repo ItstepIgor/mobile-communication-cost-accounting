@@ -1,10 +1,10 @@
 package com.importservice.service;
 
-import org.springframework.web.multipart.MultipartFile;
+import com.importservice.xml.ReportMTS;
 
 
 public interface CallServiceMTS {
 
 
-    void createCall(MultipartFile file);
+    void createCall(ReportMTS reportMTS);
 }

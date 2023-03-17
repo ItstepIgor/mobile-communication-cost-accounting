@@ -3,7 +3,6 @@ package com.importservice.service.impl;
 import com.importservice.entity.Call;
 import com.importservice.reposiitory.CallRepository;
 import com.importservice.service.CallService;
-import com.importservice.service.ImportPeriodService;
 import com.importservice.service.OneTimeCallServiceService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -31,20 +29,19 @@ public class CallServiceImpl implements CallService {
 
     private final OneTimeCallServiceService oneTimeCallServiceService;
 
-    private final ImportPeriodService importPeriodService;
-
 
     @Override
     @Transactional
     @SneakyThrows
-    public void createCall(MultipartFile file) {
+    public void createCall(XSSFWorkbook myExcelBook) {
         System.out.println(LocalDateTime.now());
-        XSSFWorkbook myExcelBook = new XSSFWorkbook(file.getInputStream());
-        importPeriodService.saveImportPeriod(myExcelBook);
+
         List<Call> calls = readFromExcelSeveralPage(myExcelBook);
         oneTimeCallServiceService.saveOneTimeCallService(calls);
         saveCall(calls);
+
     }
+
 
     private void saveCall(List<Call> calls) {
         List<Call> callList = calls.stream()

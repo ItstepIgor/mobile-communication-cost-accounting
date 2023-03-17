@@ -1,10 +1,9 @@
 package com.importservice.service;
 
-import org.springframework.web.multipart.MultipartFile;
-
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public interface CallService {
 
 
-    void createCall(MultipartFile file);
+    void createCall(XSSFWorkbook myExcelBook);
 }

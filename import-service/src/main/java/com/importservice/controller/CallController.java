@@ -1,9 +1,8 @@
 package com.importservice.controller;
 
 import com.importservice.dto.AllCallServiceDTO;
-import com.importservice.service.CallService;
 import com.importservice.service.AllCallServiceService;
-import com.importservice.service.CallServiceMTS;
+import com.importservice.service.ImportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,8 +23,7 @@ import java.util.List;
 @CrossOrigin("http://localhost:8765")
 public class CallController {
 
-    private final CallService callService;
-    private final CallServiceMTS callServiceMTS;
+    private final ImportService importService;
     private final AllCallServiceService allCallServiceService;
 
     @GetMapping("/check")
@@ -39,9 +37,8 @@ public class CallController {
             description = "Вызывается метод заполнения данных по номерам телефонов и услугам"
     )
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void uploadFile(@RequestParam("file") @Parameter(description = "Загружаем файл ZIP") MultipartFile file) {
-        callService.createCall(file);
-        allCallServiceService.createCallService(file);
+    public void uploadZipFile(@RequestParam("file") @Parameter(description = "Загружаем файл ZIP") MultipartFile file) {
+        importService.importA1(file);
     }
 
     @Operation(
@@ -59,6 +56,6 @@ public class CallController {
 
     @PostMapping(value = "/importmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void importMTS(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
-        callServiceMTS.createCall(file);
+        importService.importMTS(file);
     }
 }
