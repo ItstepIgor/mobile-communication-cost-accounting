@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +26,7 @@ public class ImportServiceImpl implements ImportService {
     @Override
     @SneakyThrows
     public void importA1(MultipartFile file) {
-        InputStream inputStream = Extractor.extractZip(file);
+        InputStream inputStream = Extractor.extractFromArchive(file);
         XSSFWorkbook myExcelBook = new XSSFWorkbook(inputStream);
         periodService.saveImportPeriod(myExcelBook);
         callService.createCall(myExcelBook);
@@ -36,7 +35,7 @@ public class ImportServiceImpl implements ImportService {
 
     @Override
     public void importMTS(MultipartFile file) {
-        List<InputStream> inputStreams = Extractor.extractRar(file);
+        InputStream inputStreams = Extractor.extractFromArchive(file);
         callServiceMTS.createCall(Unmarshaller.unmarshallerMTS(inputStreams));
     }
 }

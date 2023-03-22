@@ -5,24 +5,17 @@ import jakarta.xml.bind.JAXBContext;
 import lombok.SneakyThrows;
 
 import java.io.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class Unmarshaller {
     @SneakyThrows
-    public static ReportMTS unmarshallerMTS(List<InputStream> inputStreams) {
-        inputStreams.set(0, checkForUtf8BOM(inputStreams.get(0)));
-        StringBuilder stringBuilder = new StringBuilder();
-        for (InputStream inputStream : inputStreams) {
+    public static ReportMTS unmarshallerMTS(InputStream inputStream) {
             String body;
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-                System.out.println();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(checkForUtf8BOM(inputStream)))) {
                 body = br.lines().collect(Collectors.joining());
-                stringBuilder.append(body);
             }
-        }
 
-        StringReader reader = new StringReader(stringBuilder.toString());
+        StringReader reader = new StringReader(body);
         JAXBContext context = JAXBContext.newInstance(ReportMTS.class);
         jakarta.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
         return (ReportMTS) unmarshaller.unmarshal(reader);
