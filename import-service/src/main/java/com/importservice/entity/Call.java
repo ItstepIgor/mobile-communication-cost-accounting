@@ -46,4 +46,6 @@ public class Call {
     @Column(nullable = false)
     private int dayOfWeek;
 
+    @Column(nullable = false)
+    private String mobileOperator;
 }

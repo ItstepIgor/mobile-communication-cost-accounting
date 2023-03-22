@@ -78,7 +78,7 @@ public class CallServiceImpl implements CallService {
                         callService = row.getCell(0).getStringCellValue();
                         continue;
                     }
-                    calls.add(fillingCallSeveralPage(ownerNumberTemp, callService, row));
+                    calls.add(fillingCall(ownerNumberTemp, callService, row));
                 }
             }
         }
@@ -87,7 +87,7 @@ public class CallServiceImpl implements CallService {
         return calls;
     }
 
-    private Call fillingCallSeveralPage(String ownerNumberTemp, String callService, Row row) {
+    private Call fillingCall(String ownerNumberTemp, String callService, Row row) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
         Call call = new Call();
         call.setOwnerNumber(ownerNumberTemp);
@@ -112,6 +112,7 @@ public class CallServiceImpl implements CallService {
         call.setSum(BigDecimal.valueOf(row.getCell(4).getNumericCellValue()));
         call.setShortNumber(Long.parseLong(ownerNumberTemp.substring(1, 10)));
         call.setDayOfWeek(call.getCallDateTime().getDayOfWeek().getValue());
+        call.setMobileOperator("A1");
         return call;
     }
 }
