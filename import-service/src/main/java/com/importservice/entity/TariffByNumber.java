@@ -13,19 +13,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "import_periods")
-public class ImportPeriod {
+public class TariffByNumber {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(nullable = false)
-    private String period;
+    private String number;
 
     @Column(nullable = false)
-    private LocalDateTime creationDate;
+    private String owner;
 
     @Column(nullable = false)
-    private String mobileOperator;
+    private String tariffName;
+
+    @Column(nullable = false)
+    private LocalDateTime startDateTime;
+
+    @Column(nullable = false)
+    private LocalDateTime endDateTime;
 
 }

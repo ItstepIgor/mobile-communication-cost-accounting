@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 @Data
 @XmlAccessorType(XmlAccessType.FIELD)
-public class AllCallServiceMTS {
+public class TariffPlanListMTS {
 
     @XmlAttribute(name = "n")
     private String n;

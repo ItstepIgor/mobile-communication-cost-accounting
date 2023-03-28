@@ -15,10 +15,11 @@ public class Unmarshaller {
                 body = br.lines().collect(Collectors.joining());
             }
 
-        StringReader reader = new StringReader(body);
-        JAXBContext context = JAXBContext.newInstance(ReportMTS.class);
-        jakarta.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
-        return (ReportMTS) unmarshaller.unmarshal(reader);
+        try (StringReader reader = new StringReader(body)) {
+            JAXBContext context = JAXBContext.newInstance(ReportMTS.class);
+            jakarta.xml.bind.Unmarshaller unmarshaller = context.createUnmarshaller();
+            return (ReportMTS) unmarshaller.unmarshal(reader);
+        }
     }
 
 

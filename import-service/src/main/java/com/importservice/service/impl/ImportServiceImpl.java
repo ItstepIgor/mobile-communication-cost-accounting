@@ -3,6 +3,7 @@ package com.importservice.service.impl;
 import com.importservice.service.*;
 import com.importservice.util.Extractor;
 import com.importservice.util.Unmarshaller;
+import com.importservice.xml.ReportMTS;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -28,7 +29,7 @@ public class ImportServiceImpl implements ImportService {
     public void importA1(MultipartFile file) {
         InputStream inputStream = Extractor.extractFromArchive(file);
         XSSFWorkbook myExcelBook = new XSSFWorkbook(inputStream);
-        periodService.saveImportPeriod(myExcelBook);
+        periodService.saveImportPeriodA1(myExcelBook);
         callService.createCall(myExcelBook);
         allCallServiceService.createCallService(myExcelBook);
     }
@@ -36,6 +37,8 @@ public class ImportServiceImpl implements ImportService {
     @Override
     public void importMTS(MultipartFile file) {
         InputStream inputStreams = Extractor.extractFromArchive(file);
-        callServiceMTS.createCall(Unmarshaller.unmarshallerMTS(inputStreams));
+        ReportMTS reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
+        periodService.saveImportPeriodMTS(reportMTS);
+        callServiceMTS.createCall(reportMTS);
     }
 }

@@ -17,7 +17,7 @@ public class ReportMTS {
     private List<ImportPeriodMTS> b = new ArrayList<>();
     @XmlElementWrapper(name="pcs")
     @XmlElement(name="pc")
-    private List<AllCallServiceMTS> pc = new ArrayList<>();
+    private List<TariffPlanListMTS> pc = new ArrayList<>();
     @XmlElement(name = "pod")
     private List<MonthlyCallServiceMTS> pod = new ArrayList<>();
 
