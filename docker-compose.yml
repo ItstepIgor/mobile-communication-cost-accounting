@@ -123,7 +123,7 @@ services:
 #    depends_on:
 #      - config-service
 ##      - discovery-service
-#
+
 #  calculate-service:
 #    build:
 #      context: ./calculate-service
@@ -163,6 +163,7 @@ services:
 #      CONSUL_HOST: consul
 #      CONSUL_PORT: 8500
 #      CONFIG_SERVICE_URL: http://config-service:8888
+#      HOSTNAME: 172.24.120.99 - вместо IP можно взять адрес хоста из переменной окружения
 #    restart: always
 #    networks:
 #      - mobile-communication-net
@@ -170,7 +171,7 @@ services:
 #      - config-service
 #      - import_db_service
 ##      - discovery-service
-#
+
 ##  authorization-service:
 ##    build:
 ##      context: ./authorization-service

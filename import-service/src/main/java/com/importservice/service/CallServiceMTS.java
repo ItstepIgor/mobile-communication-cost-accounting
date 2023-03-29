@@ -6,5 +6,5 @@ import com.importservice.xml.ReportMTS;
 public interface CallServiceMTS {
 
 
-    void createCall(ReportMTS reportMTS);
+    void saveToDataBaseFromFileMTS(ReportMTS reportMTS);
 }

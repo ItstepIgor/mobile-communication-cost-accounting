@@ -7,8 +7,9 @@ spring:
       port: ${CONSUL_PORT:8500}
       discovery:
         instanceId: ${spring.application.name}:${random.value}
-#        hostname=: ${spring.application.name}
-#        preferIpAddress: true
+#        hostname: ${HOSTNAME:localhost} - использовать если из docker передаем IP хоста
+##        hostname: ${spring.application.name} - используем если прописать в файле hosts имя сервиса
+        preferIpAddress: false
   datasource:
     url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost:5433}/${POSTGRES_DB_NAME:import_db}
     username: ${POSTGRES_USERNAME:postgres}
@@ -16,7 +17,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
-#    show-sql: true
+  #    show-sql: true
   servlet:
     multipart:
       max-file-size: 20MB

@@ -39,6 +39,6 @@ public class ImportServiceImpl implements ImportService {
         InputStream inputStreams = Extractor.extractFromArchive(file);
         ReportMTS reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
         periodService.saveImportPeriodMTS(reportMTS);
-        callServiceMTS.createCall(reportMTS);
+        callServiceMTS.saveToDataBaseFromFileMTS(reportMTS);
     }
 }
