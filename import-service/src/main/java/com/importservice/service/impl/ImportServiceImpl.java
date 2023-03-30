@@ -27,17 +27,25 @@ public class ImportServiceImpl implements ImportService {
     @Override
     @SneakyThrows
     public void importA1(MultipartFile file) {
-        InputStream inputStream = Extractor.extractFromArchive(file);
-        XSSFWorkbook myExcelBook = new XSSFWorkbook(inputStream);
+        XSSFWorkbook myExcelBook;
+        //TODO если извлекать из архива этим методом то при повторном извлечении после MTS возникает ошибка
+        // нужно разобраться почему. Так же и импорт MTS если запускать второй раз так же ошибка
+//        try (InputStream inputStream = Extractor.extractFromArchive(file)) {
+        try (InputStream inputStream = Extractor.extractZip(file)) {
+            myExcelBook = new XSSFWorkbook(inputStream);
+        }
         periodService.saveImportPeriodA1(myExcelBook);
         callService.createCall(myExcelBook);
         allCallServiceService.createCallService(myExcelBook);
     }
 
     @Override
+    @SneakyThrows
     public void importMTS(MultipartFile file) {
-        InputStream inputStreams = Extractor.extractFromArchive(file);
-        ReportMTS reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
+        ReportMTS reportMTS;
+        try (InputStream inputStreams = Extractor.extractFromArchive(file)) {
+            reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
+        }
         periodService.saveImportPeriodMTS(reportMTS);
         callServiceMTS.saveToDataBaseFromFileMTS(reportMTS);
     }

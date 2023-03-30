@@ -14,6 +14,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class Extractor {
 
@@ -29,55 +31,59 @@ public class Extractor {
             os.write(file.getBytes());
         }
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(filepath.toString(), "r")) {
-            RandomAccessFileInStream randomAccessFileStream = new RandomAccessFileInStream(randomAccessFile);
+            try (RandomAccessFileInStream randomAccessFileStream = new RandomAccessFileInStream(randomAccessFile)) {
 
-            IInArchive inArchive = SevenZip.openInArchive(null, randomAccessFileStream);
-            ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
-            for (ISimpleInArchiveItem item : simpleInArchive.getArchiveItems()) {
-                if (!item.isFolder()) {
-                    ExtractOperationResult result;
-                    result = item.extractSlow(data -> {
-                        try {
-                            outputStream.write(data);
-                            return data.length;
-                        } catch (IOException e) {
-                            throw new SevenZipException(e.getMessage(), e.getCause());
+                try (IInArchive inArchive = SevenZip.openInArchive(null, randomAccessFileStream)) {
+                    ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
+
+                    for (ISimpleInArchiveItem item : simpleInArchive.getArchiveItems()) {
+                        if (!item.isFolder()) {
+                            ExtractOperationResult result;
+                            result = item.extractSlow(data -> {
+                                try {
+                                    outputStream.write(data);
+                                    return data.length;
+                                } catch (IOException e) {
+                                    throw new SevenZipException(e.getMessage(), e.getCause());
+                                }
+                            });
+
+                            if (result != ExtractOperationResult.OK) {
+                                throw new RuntimeException(
+                                        String.format("Error extracting archive. Extracting error: %s", result));
+                            }
                         }
-                    });
-
-                    if (result != ExtractOperationResult.OK) {
-                        throw new RuntimeException(
-                                String.format("Error extracting archive. Extracting error: %s", result));
                     }
                 }
             }
         }
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray() );
-        Files.delete(filepath);
-        outputStream.close();
-        return inputStream;
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
+            Files.delete(filepath);
+            outputStream.close();
+            return inputStream;
+        }
     }
 
 
     //Метод для извлечения из ZIP файла
-//    @SneakyThrows
-//    public static InputStream extractZip(MultipartFile file) {
-//        InputStream inputStream = null;
-//        byte[] buffer = new byte[1024];
-//        try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
-//            ZipEntry zipEntry = zis.getNextEntry();
-//            while (zipEntry != null) {
-//                ByteArrayOutputStream fos = new ByteArrayOutputStream();
-//                int len;
-//                while ((len = zis.read(buffer)) > 0) {
-//                    fos.write(buffer, 0, len);
-//                }
-//                inputStream = new ByteArrayInputStream(fos.toByteArray());
-//                zipEntry = zis.getNextEntry();
-//            }
-//
-//            zis.closeEntry();
-//        }
-//        return inputStream;
-//    }
+    @SneakyThrows
+    public static InputStream extractZip(MultipartFile file) {
+        InputStream inputStream = null;
+        byte[] buffer = new byte[1024];
+        try (ZipInputStream zis = new ZipInputStream(file.getInputStream())) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                ByteArrayOutputStream fos = new ByteArrayOutputStream();
+                int len;
+                while ((len = zis.read(buffer)) > 0) {
+                    fos.write(buffer, 0, len);
+                }
+                inputStream = new ByteArrayInputStream(fos.toByteArray());
+                zipEntry = zis.getNextEntry();
+            }
+
+            zis.closeEntry();
+        }
+        return inputStream;
+    }
 }
