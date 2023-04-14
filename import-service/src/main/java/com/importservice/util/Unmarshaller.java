@@ -5,13 +5,14 @@ import jakarta.xml.bind.JAXBContext;
 import lombok.SneakyThrows;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public class Unmarshaller {
     @SneakyThrows
     public static ReportMTS unmarshallerMTS(InputStream inputStream) {
             String body;
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(checkForUtf8BOM(inputStream)))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(checkForUtf8BOM(inputStream), StandardCharsets.UTF_8))) {
                 body = br.lines().collect(Collectors.joining());
             }
 

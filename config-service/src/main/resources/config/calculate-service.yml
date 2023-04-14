@@ -14,6 +14,13 @@ spring:
     username: ${POSTGRES_USERNAME:postgres}
     password: ${POSTGRES_PASSWORD:sa}
     driver-class-name: org.postgresql.Driver
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:localhost:9093}
+    consumer:
+      auto-offset-reset: earliest
+      group-id: "default"
   jpa:
     database: postgresql
 #    show-sql: true
+topic:
+  name: t.call

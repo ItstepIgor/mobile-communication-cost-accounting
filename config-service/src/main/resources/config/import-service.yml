@@ -10,6 +10,8 @@ spring:
 #        hostname: ${HOSTNAME:localhost} - использовать если из docker передаем IP хоста
 ##        hostname: ${spring.application.name} - используем если прописать в файле hosts имя сервиса
         preferIpAddress: false
+  kafka:
+    bootstrap-servers: ${KAFKA_URL:localhost:9093}
   datasource:
     url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost:5433}/${POSTGRES_DB_NAME:import_db}
     username: ${POSTGRES_USERNAME:postgres}
@@ -22,3 +24,5 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+topic:
+  name: t.call

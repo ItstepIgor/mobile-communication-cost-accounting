@@ -108,7 +108,7 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                     .stream()
                     .filter(allCallServiceDTO -> allCallServiceDTO
                             .getCallServiceName().equals(monthlyCallServiceName))
-                    .filter(distinctByKey(AllCallServiceDTO::getSum))
+                    .filter(distinctBySum(AllCallServiceDTO::getSum))
                     .toList();
 
             for (AllCallServiceDTO allCallServiceDTO : tempCallServiceDTOS) {
@@ -122,11 +122,11 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
         monthlyCallServiceCostRepository.saveAll(monthlyCallServiceCosts);
     }
 
-    public static <T> Predicate<T> distinctByKey(
-            Function<? super T, ?> keyExtractor) {
+    public static <T> Predicate<T> distinctBySum(
+            Function<? super T, ?> sumExtractor) {
 
         Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+        return t -> seen.putIfAbsent(sumExtractor.apply(t), Boolean.TRUE) == null;
     }
 
     private void createPhoneNumber(List<AllCallServiceDTO> allCallServiceDTOS) {

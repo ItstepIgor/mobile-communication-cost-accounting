@@ -8,10 +8,12 @@ import com.importservice.reposiitory.AllExpensesByPhoneNumberRepository;
 import com.importservice.reposiitory.CallRepository;
 import com.importservice.reposiitory.MonthlyCallServiceRepository;
 import com.importservice.reposiitory.TariffByNumberRepository;
+import com.importservice.service.producer.Producer;
 import com.importservice.xml.*;
 import com.importservice.service.CallServiceMTS;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -28,12 +30,13 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CallServiceMTSImpl implements CallServiceMTS {
 
-
+    private final Producer producer;
     private final CallRepository callRepository;
     private final AllExpensesByPhoneNumberRepository allExpensesByPhoneNumberRepository;
     private final MonthlyCallServiceRepository monthlyCallServiceRepository;
     private final TariffByNumberRepository tariffByNumberRepository;
 
+    @SneakyThrows
     @Override
     @Transactional
     public void saveToDataBaseFromFileMTS(ReportMTS reportMTS) {
@@ -41,6 +44,8 @@ public class CallServiceMTSImpl implements CallServiceMTS {
 
         List<Call> callList = fillingCallList(reportMTS, dateTimeFormatter);
         callRepository.saveAll(callList);
+        producer.sendCall(callList);
+
 
         List<TariffByNumber> tarriffList = fillingTariffList(reportMTS, dateTimeFormatter);
         tariffByNumberRepository.saveAll(tarriffList);

@@ -28,6 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
@@ -44,6 +45,7 @@ dependencies {
 
 	testCompileOnly "org.projectlombok:lombok:${versions.lombok}"
 	testAnnotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
 
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -4,6 +4,7 @@ import com.importservice.entity.Call;
 import com.importservice.reposiitory.CallRepository;
 import com.importservice.service.CallService;
 import com.importservice.service.OneTimeCallServiceService;
+import com.importservice.service.producer.Producer;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -24,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CallServiceImpl implements CallService {
 
+    private final Producer producer;
 
     private final CallRepository callRepository;
 
@@ -38,17 +40,18 @@ public class CallServiceImpl implements CallService {
 
         List<Call> calls = readFromExcelSeveralPage(myExcelBook);
         oneTimeCallServiceService.saveOneTimeCallService(calls);
-        saveCall(calls);
+
+        saveAndSendCall(calls);
 
     }
 
-
-    private void saveCall(List<Call> calls) {
+    @SneakyThrows
+    private void saveAndSendCall(List<Call> calls) {
         List<Call> callList = calls.stream()
                 .filter(call -> !(call.getSum().equals(BigDecimal.valueOf(0.0))))
                 .toList();
-
         callRepository.saveAll(callList);
+        producer.sendCall(callList);
     }
 
 

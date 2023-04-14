@@ -40,6 +40,7 @@ dependencies {
     implementation "org.apache.poi:poi-ooxml:${versions.poi}"
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding:16.02-2.01'
     implementation 'net.sf.sevenzipjbinding:sevenzipjbinding-all-platforms:16.02-2.01'
+    implementation 'org.springframework.kafka:spring-kafka'
 
     compileOnly "org.projectlombok:lombok:${versions.lombok}"
     annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
@@ -48,6 +49,7 @@ dependencies {
 
     testCompileOnly "org.projectlombok:lombok:${versions.lombok}"
     testAnnotationProcessor "org.projectlombok:lombok:${versions.lombok}"
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
     runtimeOnly 'org.postgresql:postgresql'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

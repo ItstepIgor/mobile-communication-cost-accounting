@@ -4,6 +4,7 @@ import com.calculateservice.dto.AllCallServiceDTO;
 import com.calculateservice.service.CheckDataService;
 import com.calculateservice.service.FillingDataBaseService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,12 +27,13 @@ public class FillingAndCheckDataController {
 
     @Operation(
             summary = "Заполнение БД",
-            description = "Вызывается метод заполнения данных по номерам телефонов и услугам"
+            description = "Вызывается метод заполнения данных по номерам телефонов и услугам указываем дату "
     )
     @GetMapping("/service")
     public void getService(@RequestParam(value = "date")
                            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                    fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
+                           @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                            LocalDate date) {
         fillingDataBaseService.fillingDataBase(date);
     }
@@ -44,6 +46,7 @@ public class FillingAndCheckDataController {
     public List<AllCallServiceDTO> checkSumMonthlyCallService(@RequestParam(value = "date")
                                                               @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                                       fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
+                                                              @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                                                               LocalDate date) {
         System.out.println(date);
         return checkDataService.checkSumMonthlyCallService(date);
