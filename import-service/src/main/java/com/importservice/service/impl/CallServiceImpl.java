@@ -51,7 +51,7 @@ public class CallServiceImpl implements CallService {
                 .filter(call -> !(call.getSum().equals(BigDecimal.valueOf(0.0))))
                 .toList();
         callRepository.saveAll(callList);
-        producer.sendCall(callList);
+//        producer.sendCall(callList);
     }
 
 

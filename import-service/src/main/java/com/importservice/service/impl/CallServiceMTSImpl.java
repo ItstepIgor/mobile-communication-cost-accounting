@@ -14,6 +14,8 @@ import com.importservice.service.CallServiceMTS;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -35,6 +37,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
     private final AllExpensesByPhoneNumberRepository allExpensesByPhoneNumberRepository;
     private final MonthlyCallServiceRepository monthlyCallServiceRepository;
     private final TariffByNumberRepository tariffByNumberRepository;
+    private final KafkaTemplate<String, List<Call>> kafkaTemplate;
 
     @SneakyThrows
     @Override
@@ -44,7 +47,8 @@ public class CallServiceMTSImpl implements CallServiceMTS {
 
         List<Call> callList = fillingCallList(reportMTS, dateTimeFormatter);
         callRepository.saveAll(callList);
-        producer.sendCall(callList);
+        kafkaTemplate.send("callTopic", callList);
+//        producer.sendCall(callList);
 
 
         List<TariffByNumber> tarriffList = fillingTariffList(reportMTS, dateTimeFormatter);
