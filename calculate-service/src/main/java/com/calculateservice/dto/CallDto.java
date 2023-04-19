@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -12,7 +13,7 @@ import java.math.BigDecimal;
 public class CallDto {
     private String ownerNumber;
     private String callService;
-    private String callDateTime;
+    private LocalDateTime callDateTime;
     private String code;
     private String callTime;
     private String number;

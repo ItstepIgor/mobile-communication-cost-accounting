@@ -16,6 +16,13 @@ spring:
     driver-class-name: org.postgresql.Driver
   kafka:
     bootstrap-servers: ${KAFKA_URL:localhost:9093}
+    fetch:
+      max:
+        bytes: 4000000
+    max:
+      partition:
+        fetch:
+          bytes: 4000000
     consumer:
       auto-offset-reset: earliest
       group-id: "default"

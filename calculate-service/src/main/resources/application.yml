@@ -3,5 +3,3 @@ spring:
     name: calculate-service
   config:
     import: optional:configserver:${CONFIG_SERVICE_URL:http://localhost:8888}
-  jpa:
-    show-sql: true

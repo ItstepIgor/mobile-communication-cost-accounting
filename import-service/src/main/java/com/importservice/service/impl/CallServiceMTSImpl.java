@@ -1,5 +1,6 @@
 package com.importservice.service.impl;
 
+import com.importservice.dto.CallDTO;
 import com.importservice.entity.AllExpensesByPhoneNumber;
 import com.importservice.entity.Call;
 import com.importservice.entity.MonthlyCallService;
@@ -8,13 +9,12 @@ import com.importservice.reposiitory.AllExpensesByPhoneNumberRepository;
 import com.importservice.reposiitory.CallRepository;
 import com.importservice.reposiitory.MonthlyCallServiceRepository;
 import com.importservice.reposiitory.TariffByNumberRepository;
-import com.importservice.service.producer.Producer;
+import com.importservice.service.mapper.CallListMapper;
 import com.importservice.xml.*;
 import com.importservice.service.CallServiceMTS;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -32,12 +32,12 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CallServiceMTSImpl implements CallServiceMTS {
 
-    private final Producer producer;
     private final CallRepository callRepository;
     private final AllExpensesByPhoneNumberRepository allExpensesByPhoneNumberRepository;
     private final MonthlyCallServiceRepository monthlyCallServiceRepository;
     private final TariffByNumberRepository tariffByNumberRepository;
-    private final KafkaTemplate<String, List<Call>> kafkaTemplate;
+    private final CallListMapper callListMapper;
+    private final KafkaTemplate<String, List<CallDTO>> kafkaTemplate;
 
     @SneakyThrows
     @Override
@@ -47,9 +47,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
 
         List<Call> callList = fillingCallList(reportMTS, dateTimeFormatter);
         callRepository.saveAll(callList);
-        kafkaTemplate.send("callTopic", callList);
-//        producer.sendCall(callList);
-
+        kafkaTemplate.send("callMTS", callListMapper.listCallToListCallDto(callList));
 
         List<TariffByNumber> tarriffList = fillingTariffList(reportMTS, dateTimeFormatter);
         tariffByNumberRepository.saveAll(tarriffList);

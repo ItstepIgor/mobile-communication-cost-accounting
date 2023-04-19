@@ -1,10 +1,11 @@
 package com.importservice.service.impl;
 
+import com.importservice.dto.CallDTO;
 import com.importservice.entity.Call;
 import com.importservice.reposiitory.CallRepository;
 import com.importservice.service.CallService;
 import com.importservice.service.OneTimeCallServiceService;
-import com.importservice.service.producer.Producer;
+import com.importservice.service.mapper.CallListMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -13,6 +14,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,11 +27,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CallServiceImpl implements CallService {
 
-    private final Producer producer;
 
     private final CallRepository callRepository;
 
+    private final CallListMapper callListMapper;
+
     private final OneTimeCallServiceService oneTimeCallServiceService;
+
+    private final KafkaTemplate<String, List<CallDTO>> kafkaTemplate;
 
 
     @Override
@@ -51,7 +56,7 @@ public class CallServiceImpl implements CallService {
                 .filter(call -> !(call.getSum().equals(BigDecimal.valueOf(0.0))))
                 .toList();
         callRepository.saveAll(callList);
-//        producer.sendCall(callList);
+        kafkaTemplate.send("callA1", callListMapper.listCallToListCallDto(callList));
     }
 
 

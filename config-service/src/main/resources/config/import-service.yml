@@ -12,6 +12,9 @@ spring:
         preferIpAddress: false
   kafka:
     bootstrap-servers: ${KAFKA_URL:localhost:9093}
+    max:
+      request:
+        size: 4000000
   datasource:
     url: jdbc:postgresql://${POSTGRES_DB_HOST:localhost:5433}/${POSTGRES_DB_NAME:import_db}
     username: ${POSTGRES_USERNAME:postgres}
