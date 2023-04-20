@@ -8,8 +8,8 @@ ALTER TABLE IF EXISTS owner
 ALTER TABLE IF EXISTS owner
     ADD CONSTRAINT FK_owner_position FOREIGN KEY (position_id) REFERENCES position;
 
-ALTER TABLE IF EXISTS number
-    ADD CONSTRAINT FK_number_owner_group FOREIGN KEY (group_number_id) REFERENCES group_number;
+ALTER TABLE IF EXISTS phone_number
+    ADD CONSTRAINT FK_phone_number_owner_group FOREIGN KEY (group_number_id) REFERENCES group_number;
 
 ALTER TABLE IF EXISTS rule_one_time_call_service
     ADD CONSTRAINT FK_rule_one_time_call_service_one_time_call_service FOREIGN KEY (one_time_call_service_id)
@@ -39,3 +39,7 @@ ALTER TABLE IF EXISTS result
 
 ALTER TABLE IF EXISTS individual_result
     ADD CONSTRAINT FK_individual_result_number FOREIGN KEY (number_id) REFERENCES phone_number;
+
+ALTER TABLE IF EXISTS phone_number
+    ADD CONSTRAINT FK_phone_number_mobile_operator FOREIGN KEY (mobile_operator_id) REFERENCES mobile_operator;
+

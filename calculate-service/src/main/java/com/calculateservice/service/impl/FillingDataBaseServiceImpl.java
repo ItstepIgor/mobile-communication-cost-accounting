@@ -1,11 +1,9 @@
 package com.calculateservice.service.impl;
 
 import com.calculateservice.dto.AllCallServiceDTO;
+import com.calculateservice.dto.AllExpensesByPhoneNumberDTO;
 import com.calculateservice.entity.*;
-import com.calculateservice.repository.MonthlyCallServiceCostRepository;
-import com.calculateservice.repository.MonthlyCallServiceRepository;
-import com.calculateservice.repository.OneTimeCallServiceRepository;
-import com.calculateservice.repository.PhoneNumberRepository;
+import com.calculateservice.repository.*;
 import com.calculateservice.service.FillingDataBaseService;
 import com.calculateservice.util.ImportFeignClients;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +28,12 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
     private final MonthlyCallServiceRepository monthlyCallServiceRepository;
 
     private final MonthlyCallServiceCostRepository monthlyCallServiceCostRepository;
+
     private final PhoneNumberRepository phoneNumberRepository;
+
+    private final GroupNumberRepository groupNumberRepository;
+
+    private final MobileOperatorRepository mobileOperatorRepository;
 
 
     public void fillingDataBase(LocalDate date) {
@@ -38,12 +41,26 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
         createOneTimeCallServices(allCallServiceDTOS);
         List<MonthlyCallService> monthlyCallServices = createMonthlyCallService(allCallServiceDTOS);
         createMonthlyCallServiceCost(allCallServiceDTOS, monthlyCallServices);
-        createPhoneNumber(allCallServiceDTOS);
+
+        Set<Long> phoneNumberFromAllCallService = allCallServiceDTOS.stream()
+                .map(AllCallServiceDTO::getNumber)
+                .collect(Collectors.toSet());
+        createPhoneNumber(phoneNumberFromAllCallService, mobileOperatorRepository.findById(1L).orElse(null));
+
+        List<AllExpensesByPhoneNumberDTO> allExpensesByPhoneNumber = findAllExpensesByPhoneNumber(date);
+        Set<Long> phoneNumberFromExpensesByPhoneNumber = allExpensesByPhoneNumber.stream()
+                .map(allExpensesByPhoneNumberDTO -> Long.valueOf(allExpensesByPhoneNumberDTO.getNumber().substring(3, 12)))
+                .collect(Collectors.toSet());
+        createPhoneNumber(phoneNumberFromExpensesByPhoneNumber, mobileOperatorRepository.findById(2L).orElse(null));
     }
 
 
     private List<AllCallServiceDTO> findAllCommonCallService(LocalDate date) {
         return importFeignClients.findAllCommonCallService(date).getBody();
+    }
+
+    private List<AllExpensesByPhoneNumberDTO> findAllExpensesByPhoneNumber(LocalDate date) {
+        return importFeignClients.findAllExpensesByPhoneNumberMTS(date).getBody();
     }
 
     private void createOneTimeCallServices(List<AllCallServiceDTO> allCallServiceDTOS) {
@@ -129,24 +146,22 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
         return t -> seen.putIfAbsent(sumExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    private void createPhoneNumber(List<AllCallServiceDTO> allCallServiceDTOS) {
-        Set<PhoneNumber> phoneNumbers = new HashSet<>();
+    private void createPhoneNumber(Set<Long> phoneNumberFromAllCallService, MobileOperator mobileOperator) {
         List<PhoneNumber> allPhoneNumber = findAllPhoneNumber();
 
         Set<Long> phoneNumberName = allPhoneNumber.stream()
                 .map(PhoneNumber::getNumber)
                 .collect(Collectors.toSet());
 
-        allCallServiceDTOS.stream()
-                .filter(allCallServiceDTO -> !phoneNumberName.contains(allCallServiceDTO.getNumber()))
-                .forEach(allCallServiceDTO -> {
+        Set<PhoneNumber> phoneNumbers = new HashSet<>();
+        phoneNumberFromAllCallService.stream()
+                .filter(number -> !phoneNumberName.contains(number))
+                .forEach(number -> {
                     PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setNumber(allCallServiceDTO.getNumber());
+                    phoneNumber.setNumber(number);
                     phoneNumber.setCreationDate(LocalDateTime.now());
-                    phoneNumber.setGroupNumber(GroupNumber.builder()
-                            .id(7)
-                            .groupNumberName("Общая группа")
-                            .build());
+                    phoneNumber.setGroupNumber(groupNumberRepository.findById(7L).orElse(null));
+                    phoneNumber.setMobileOperator(mobileOperator);
                     phoneNumbers.add(phoneNumber);
                 });
 

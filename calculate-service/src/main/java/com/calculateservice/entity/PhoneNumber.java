@@ -30,6 +30,10 @@ public class PhoneNumber {
     @JoinColumn(name = "group_number_id", nullable = false)
     private GroupNumber groupNumber;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mobile_operator_id", nullable = false)
+    private MobileOperator mobileOperator;
+
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "number_rule_one_time_call_service", joinColumns = {@JoinColumn(name = "number_id")},

@@ -1,7 +1,9 @@
 package com.importservice.controller;
 
 import com.importservice.dto.AllCallServiceDTO;
+import com.importservice.dto.AllExpensesByPhoneNumberDTO;
 import com.importservice.service.AllCallServiceService;
+import com.importservice.service.FindAllCallServiceMTS;
 import com.importservice.service.ImportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +27,7 @@ public class CallController {
 
     private final ImportService importService;
     private final AllCallServiceService allCallServiceService;
+    private final FindAllCallServiceMTS findAllCallServiceMTS;
 
     @GetMapping("/check")
     public String check() {
@@ -42,8 +45,8 @@ public class CallController {
     }
 
     @Operation(
-            summary = "Для получения информации по всем сервисам",
-            description = "Получение информации по всем сервисам из БД "
+            summary = "Для получения информации по всем сервисам А1",
+            description = "Получение информации по всем сервисам A1 из БД "
     )
     @GetMapping("/service")
     public List<AllCallServiceDTO> findAllCommonCallService(@RequestParam(value = "date")
@@ -52,6 +55,19 @@ public class CallController {
                                                             @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                                                             LocalDate date) {
         return allCallServiceService.findAllByDate(date);
+    }
+
+    @Operation(
+            summary = "Для получения информации по всем начислениям МТС",
+            description = "Получение информации по всем начислениям МТС из БД "
+    )
+    @GetMapping("/expenses")
+    public List<AllExpensesByPhoneNumberDTO> findAllExpensesByPhoneNumberMTS(@RequestParam(value = "date")
+                                                                          @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
+                                                                                  fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
+                                                                          @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
+                                                                          LocalDate date) {
+        return findAllCallServiceMTS.findAllByDate(date);
     }
 
     @PostMapping(value = "/importmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

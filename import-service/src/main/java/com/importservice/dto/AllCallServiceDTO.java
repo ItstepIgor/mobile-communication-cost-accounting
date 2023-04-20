@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Schema(description = "Сущность сервиса")
+@Schema(description = "Сущность сервиса А1")
 public class AllCallServiceDTO {
     private String ownerNumber;
 

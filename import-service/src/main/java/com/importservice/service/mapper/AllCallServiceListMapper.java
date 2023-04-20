@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = AllCallService.class)
+@Mapper(componentModel = "spring", uses = AllCallServiceMapper.class)
 public interface AllCallServiceListMapper {
 
     List<AllCallServiceDTO> listAllCallServiceToListAllCallServiceDto(List<AllCallService> allCallService);
