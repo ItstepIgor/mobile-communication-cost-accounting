@@ -1,6 +1,5 @@
 package com.importservice.reposiitory;
 
-import com.importservice.entity.AllCallService;
 import com.importservice.entity.AllExpensesByPhoneNumber;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
