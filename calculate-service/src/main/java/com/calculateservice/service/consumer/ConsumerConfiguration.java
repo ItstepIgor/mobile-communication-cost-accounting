@@ -3,9 +3,9 @@ package com.calculateservice.service.consumer;
 import com.calculateservice.dto.CallDto;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,9 +28,13 @@ public class ConsumerConfiguration {
     @Value("${spring.kafka.max.partition.fetch.bytes}")
     private String maxPartitionFetchBytes;
 
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    //конфиг bean для корректного парсинга даты при получении данных по звонкам из Kafka
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        return mapper;
+    }
 
     @Bean
     public ConsumerFactory<String, List<CallDto>> consumerFactory(ObjectMapper objectMapper) {
@@ -40,13 +44,13 @@ public class ConsumerConfiguration {
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, fetchMaxBytes);
         JavaType type = objectMapper.getTypeFactory().constructParametricType(List.class, CallDto.class);
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
-                new JsonDeserializer<List<CallDto>>(type, objectMapper, false));
+                new JsonDeserializer<>(type, objectMapper, false));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, List<CallDto>> callListener() {
+    public ConcurrentKafkaListenerContainerFactory<String, List<CallDto>> callListener(ObjectMapper objectMapper) {
         ConcurrentKafkaListenerContainerFactory<String, List<CallDto>> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(consumerFactory(objectMapper));
         return factory;
     }
 }

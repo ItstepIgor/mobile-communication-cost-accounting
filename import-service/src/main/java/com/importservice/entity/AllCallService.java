@@ -41,6 +41,13 @@ public class AllCallService {
     @Column(nullable = false)
     private BigDecimal sum;
 
+    @Column(name = "sum_with_nds", nullable = false)
+    private BigDecimal sumWithNDS;
+
+    @Column(nullable = false)
+    private int mobileOperator;
+
     @Column(nullable = false)
     private Boolean oneTimeCallService;
+
 }

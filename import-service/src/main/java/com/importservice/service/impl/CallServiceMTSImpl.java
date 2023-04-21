@@ -1,14 +1,8 @@
 package com.importservice.service.impl;
 
 import com.importservice.dto.CallDTO;
-import com.importservice.entity.AllExpensesByPhoneNumber;
-import com.importservice.entity.Call;
-import com.importservice.entity.MonthlyCallService;
-import com.importservice.entity.TariffByNumber;
-import com.importservice.reposiitory.AllExpensesByPhoneNumberRepository;
-import com.importservice.reposiitory.CallRepository;
-import com.importservice.reposiitory.MonthlyCallServiceRepository;
-import com.importservice.reposiitory.TariffByNumberRepository;
+import com.importservice.entity.*;
+import com.importservice.reposiitory.*;
 import com.importservice.service.mapper.CallListMapper;
 import com.importservice.xml.*;
 import com.importservice.service.CallServiceMTS;
@@ -34,7 +28,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
 
     private final CallRepository callRepository;
     private final AllExpensesByPhoneNumberRepository allExpensesByPhoneNumberRepository;
-    private final MonthlyCallServiceRepository monthlyCallServiceRepository;
+    private final AllCallServiceRepository allCallServiceRepository;
     private final TariffByNumberRepository tariffByNumberRepository;
     private final CallListMapper callListMapper;
     private final KafkaTemplate<String, List<CallDTO>> kafkaTemplate;
@@ -58,12 +52,12 @@ public class CallServiceMTSImpl implements CallServiceMTS {
         allExpensesByPhoneNumberRepository.saveAll(allExpensesByPhoneNumbers);
 
         @SuppressWarnings("unchecked")
-        List<MonthlyCallService> monthlyCallServices = (List<MonthlyCallService>) stringObjectMap.get("MonthlyCallService");
-        monthlyCallServiceRepository.saveAll(monthlyCallServices);
+        List<AllCallService> allCallServices = (List<AllCallService>) stringObjectMap.get("MonthlyCallService");
+        allCallServiceRepository.saveAll(allCallServices);
     }
 
-    private Map<String, Object> fillingExpensesByPhoneNumber(ReportMTS reportMTS,  DateTimeFormatter dateTimeFormatter) {
-        List<MonthlyCallService> monthlyCallServices = new ArrayList<>();
+    private Map<String, Object> fillingExpensesByPhoneNumber(ReportMTS reportMTS, DateTimeFormatter dateTimeFormatter) {
+        List<AllCallService> allCallServices = new ArrayList<>();
         LocalDate date = LocalDate.parse(reportMTS.getB().get(0).getBd(), dateTimeFormatter);
         List<AllExpensesByPhoneNumber> allExpensesByPhoneNumbers = new ArrayList<>();
         MonthlyCallServiceMTS monthlyCallServiceMTS = reportMTS.getPod().get(0);
@@ -76,30 +70,34 @@ public class CallServiceMTSImpl implements CallServiceMTS {
             allExpensesByPhoneNumber.setSum(BigDecimal.valueOf(Double.parseDouble(monthlyCallServiceByNumber.getAwt())));
             allExpensesByPhoneNumber.setSumWithNDS(BigDecimal.valueOf(Double.parseDouble(monthlyCallServiceByNumber.getA())));
 
-            MonthlyCallService monthlyCallService = new MonthlyCallService();
-            monthlyCallService.setNumber(monthlyCallServiceByNumber.getN());
-            monthlyCallService.setOwner(monthlyCallServiceByNumber.getU());
+            AllCallService allCallService = new AllCallService();
+            allCallService.setNumber(Long.parseLong(monthlyCallServiceByNumber.getN().substring(3, 12)));
+            allCallService.setOwnerNumber(monthlyCallServiceByNumber.getU());
             List<CostMonthlyCallServiceByNumberMTS> costMonthlyCallServiceByNumberMTS = monthlyCallServiceByNumber.getI();
             for (CostMonthlyCallServiceByNumberMTS costMonthlyCallServiceByNumber : costMonthlyCallServiceByNumberMTS) {
-                monthlyCallService.setMonthlyCallServiceName(costMonthlyCallServiceByNumber.getN());
-                monthlyCallService.setStartDate(LocalDate.parse(costMonthlyCallServiceByNumber.getD().substring(0, 10), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-                monthlyCallService.setEndDate(LocalDate.parse(costMonthlyCallServiceByNumber.getD().substring(13, 23), DateTimeFormatter.ofPattern("dd.MM.yyyy")));
-                monthlyCallService.setInvoiceDate(date);
-                monthlyCallService.setSum(BigDecimal.valueOf(Double.parseDouble(costMonthlyCallServiceByNumber.getAwt())));
-                monthlyCallService.setSumWithNDS(BigDecimal.valueOf(Double.parseDouble(costMonthlyCallServiceByNumber.getA())));
-                monthlyCallServices.add(monthlyCallService);
+                allCallService.setCallTime("00:00");
+                allCallService.setCallServiceName(costMonthlyCallServiceByNumber.getN());
+                allCallService.setInvoiceDate(date);
+                allCallService.setSum(BigDecimal.valueOf(Double.parseDouble(costMonthlyCallServiceByNumber.getAwt())));
+                allCallService.setSumWithNDS(BigDecimal.valueOf(Double.parseDouble(costMonthlyCallServiceByNumber.getA())));
+                allCallService.setMobileOperator(2);
+                allCallService.setOneTimeCallService(true);
+                List<TaxMonthlyCallServiceByNumberMTS> taxMonthlyCallServiceByNumbersMTS = costMonthlyCallServiceByNumber.getT();
+                for (TaxMonthlyCallServiceByNumberMTS taxMonthlyCallServiceByNumberMTS : taxMonthlyCallServiceByNumbersMTS) {
+                    allCallService.setVatTax(taxMonthlyCallServiceByNumberMTS.getTr());
+                    allCallServices.add(allCallService);
+                }
             }
             allExpensesByPhoneNumbers.add(allExpensesByPhoneNumber);
-
         }
         Map<String, Object> stringObjectMap = new HashMap<>();
         stringObjectMap.put("AllExpensesByPhoneNumber", allExpensesByPhoneNumbers);
-        stringObjectMap.put("MonthlyCallService", monthlyCallServices);
+        stringObjectMap.put("MonthlyCallService", allCallServices);
 
         return stringObjectMap;
     }
 
-    private List<TariffByNumber> fillingTariffList(ReportMTS reportMTS,  DateTimeFormatter dateTimeFormatter) {
+    private List<TariffByNumber> fillingTariffList(ReportMTS reportMTS, DateTimeFormatter dateTimeFormatter) {
         List<TariffByNumber> tarriffList = new ArrayList<>();
         List<TariffPlanListMTS> reportMTSPc = reportMTS.getPc();
         for (TariffPlanListMTS tariffPlanListMTS : reportMTSPc) {
@@ -117,7 +115,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
         return tarriffList;
     }
 
-    private List<Call> fillingCallList(ReportMTS reportMTS,  DateTimeFormatter dateTimeFormatter) {
+    private List<Call> fillingCallList(ReportMTS reportMTS, DateTimeFormatter dateTimeFormatter) {
         List<Call> callList = new ArrayList<>();
         List<CallsFromNumberMTS> reportMTSNd = reportMTS.getNd();
         for (CallsFromNumberMTS callsFromNumberMTS : reportMTSNd) {
@@ -136,7 +134,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
                 call.setSum(BigDecimal.valueOf(Double.parseDouble(callMTS.getAwt())));
                 call.setShortNumber(Long.parseLong(call.getOwnerNumber().substring(3, 12)));
                 call.setDayOfWeek(call.getCallDateTime().getDayOfWeek().getValue());
-                call.setMobileOperator("MTS");
+                call.setMobileOperator(2);
                 callList.add(call);
             }
         }

@@ -122,7 +122,7 @@ public class CallServiceImpl implements CallService {
         call.setSum(BigDecimal.valueOf(row.getCell(4).getNumericCellValue()));
         call.setShortNumber(Long.parseLong(ownerNumberTemp.substring(1, 10)));
         call.setDayOfWeek(call.getCallDateTime().getDayOfWeek().getValue());
-        call.setMobileOperator("A1");
+        call.setMobileOperator(1);
         return call;
     }
 }

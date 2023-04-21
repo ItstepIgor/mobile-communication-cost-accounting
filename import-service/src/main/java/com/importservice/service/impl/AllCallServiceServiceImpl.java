@@ -50,7 +50,7 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
 
     private List<AllCallService> readServiceFromExcel(XSSFWorkbook myExcelBook) {
         List<AllCallService> calls = new ArrayList<>();
-        Set<String> callService = findAllCallServiceName();
+        Set<String> oneTimeCallServiceName = findOneTimeCallServiceName();
         XSSFSheet myExcelSheet = myExcelBook.getSheet("Page4");
         XSSFRow xssfRow = myExcelSheet.getRow(4);
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
@@ -71,16 +71,16 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
                 ownerNumberTemp = row.getCell(1).getStringCellValue();
                 continue;
             }
-            calls.add(fillingCommonCallService(callService, ownerNumberTemp, row, invoiceDate));
+            calls.add(fillingCommonCallService(oneTimeCallServiceName, ownerNumberTemp, row, invoiceDate));
         }
         return calls;
     }
 
-    private Set<String> findAllCallServiceName() {
+    private Set<String> findOneTimeCallServiceName() {
         return oneTimeCallServiceService.findOneTimeCallServiceName();
     }
 
-    private AllCallService fillingCommonCallService(Set<String> callService, String ownerNumberTemp, XSSFRow row, LocalDate invoiceDate) {
+    private AllCallService fillingCommonCallService(Set<String> oneTimeCallServiceName, String ownerNumberTemp, XSSFRow row, LocalDate invoiceDate) {
         AllCallService allCallService = new AllCallService();
         allCallService.setOwnerNumber(ownerNumberTemp);
         allCallService.setCallServiceName(row.getCell(0).getStringCellValue());
@@ -93,7 +93,9 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
         allCallService.setInvoiceDate(invoiceDate);
         allCallService.setNumber(Long.parseLong(ownerNumberTemp.substring(ownerNumberTemp.length() - 9)));
         allCallService.setSum(BigDecimal.valueOf(row.getCell(3).getNumericCellValue()));
-        allCallService.setOneTimeCallService(callService.contains(allCallService.getCallServiceName()));
+        allCallService.setSumWithNDS(BigDecimal.valueOf(row.getCell(6).getNumericCellValue()));
+        allCallService.setMobileOperator(1);
+        allCallService.setOneTimeCallService(oneTimeCallServiceName.contains(allCallService.getCallServiceName()));
         return allCallService;
     }
 }
