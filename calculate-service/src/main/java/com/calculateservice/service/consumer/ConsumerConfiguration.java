@@ -33,7 +33,7 @@ public class ConsumerConfiguration {
     private ObjectMapper objectMapper;
 
     @Bean
-    public ConsumerFactory<String, List<CallDto>> consumerFactory() {
+    public ConsumerFactory<String, List<CallDto>> consumerFactory(ObjectMapper objectMapper) {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPartitionFetchBytes);
