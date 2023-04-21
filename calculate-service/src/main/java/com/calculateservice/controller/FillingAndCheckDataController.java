@@ -48,7 +48,6 @@ public class FillingAndCheckDataController {
                                                                       fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
                                                               @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                                                               LocalDate date) {
-        System.out.println(date);
         return checkDataService.checkSumMonthlyCallService(date);
     }
 }

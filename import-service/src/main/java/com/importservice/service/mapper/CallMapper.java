@@ -7,7 +7,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface CallMapper {
 
-    CallDTO CallToCallDto(Call call);
+    CallDTO callToCallDto(Call call);
 
     Call callDtoToCall(CallDTO callDTO);
 }

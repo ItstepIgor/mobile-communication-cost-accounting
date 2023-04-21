@@ -27,7 +27,7 @@ public class MonthlyCallService {
     private String owner;
 
     @Column(nullable = false)
-    private String MonthlyCallServiceName;
+    private String monthlyCallServiceName;
 
     @Column(nullable = false)
     private LocalDate invoiceDate;

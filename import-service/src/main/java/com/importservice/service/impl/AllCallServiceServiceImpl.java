@@ -9,6 +9,7 @@ import com.importservice.service.mapper.AllCallServiceListMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AllCallServiceServiceImpl implements AllCallServiceService {
 
@@ -42,7 +44,7 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
     @SneakyThrows
     @Transactional
     public void createCallService(XSSFWorkbook myExcelBook) {
-        System.out.println(LocalDateTime.now());
+        log.info(String.valueOf(LocalDateTime.now()));
         allCallServiceRepository.saveAll(readServiceFromExcel(myExcelBook));
     }
 
@@ -54,7 +56,7 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         LocalDate invoiceDate = LocalDate.parse(xssfRow.getCell(1)
                 .getStringCellValue().substring(0, 10), dateTimeFormatter);
-        String ownerNumberTemp = null;
+        String ownerNumberTemp = "";
 
         for (int i = 7; i < myExcelSheet.getLastRowNum(); i++) {
 

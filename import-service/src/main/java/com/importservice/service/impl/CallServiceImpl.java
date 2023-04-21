@@ -9,6 +9,7 @@ import com.importservice.service.mapper.CallListMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CallServiceImpl implements CallService {
 
@@ -41,7 +43,7 @@ public class CallServiceImpl implements CallService {
     @Transactional
     @SneakyThrows
     public void createCall(XSSFWorkbook myExcelBook) {
-        System.out.println(LocalDateTime.now());
+        log.info(String.valueOf(LocalDateTime.now()));
 
         List<Call> calls = readFromExcelSeveralPage(myExcelBook);
         oneTimeCallServiceService.saveOneTimeCallService(calls);
@@ -64,8 +66,8 @@ public class CallServiceImpl implements CallService {
     private List<Call> readFromExcelSeveralPage(XSSFWorkbook myExcelBook) {
 
         List<Call> calls = new ArrayList<>();
-        String ownerNumberTemp = null;
-        String callService = null;
+        String ownerNumberTemp = "";
+        String callService = "";
         for (int i = 0; i < myExcelBook.getNumberOfSheets(); i++) {
             XSSFSheet myExcelSheet = myExcelBook.getSheetAt(i);
             if (myExcelSheet.getSheetName().contains("CallDetails")) {
@@ -91,7 +93,7 @@ public class CallServiceImpl implements CallService {
             }
         }
         myExcelBook.close();
-        System.out.println(LocalDateTime.now());
+        log.info(String.valueOf(LocalDateTime.now()));
         return calls;
     }
 
