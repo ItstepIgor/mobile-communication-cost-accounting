@@ -19,6 +19,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -42,10 +43,10 @@ public class CallServiceImpl implements CallService {
     @Override
     @Transactional
     @SneakyThrows
-    public void createCall(XSSFWorkbook myExcelBook) {
+    public void createCall(XSSFWorkbook myExcelBook, LocalDate invoiceDate) {
         log.info(String.valueOf(LocalDateTime.now()));
 
-        List<Call> calls = readFromExcelSeveralPage(myExcelBook);
+        List<Call> calls = readFromExcelSeveralPage(myExcelBook, invoiceDate);
         oneTimeCallServiceService.saveOneTimeCallService(calls);
 
         saveAndSendCall(calls);
@@ -63,7 +64,7 @@ public class CallServiceImpl implements CallService {
 
 
     @SneakyThrows
-    private List<Call> readFromExcelSeveralPage(XSSFWorkbook myExcelBook) {
+    private List<Call> readFromExcelSeveralPage(XSSFWorkbook myExcelBook, LocalDate invoiceDate) {
 
         List<Call> calls = new ArrayList<>();
         String ownerNumberTemp = "";
@@ -88,7 +89,7 @@ public class CallServiceImpl implements CallService {
                         callService = row.getCell(0).getStringCellValue();
                         continue;
                     }
-                    calls.add(fillingCall(ownerNumberTemp, callService, row));
+                    calls.add(fillingCall(ownerNumberTemp, callService, row, invoiceDate));
                 }
             }
         }
@@ -97,7 +98,7 @@ public class CallServiceImpl implements CallService {
         return calls;
     }
 
-    private Call fillingCall(String ownerNumberTemp, String callService, Row row) {
+    private Call fillingCall(String ownerNumberTemp, String callService, Row row, LocalDate invoiceDate) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss");
         Call call = new Call();
         call.setOwnerNumber(ownerNumberTemp);
@@ -108,7 +109,7 @@ public class CallServiceImpl implements CallService {
         } else {
             call.setCode(String.valueOf(row.getCell(1).getNumericCellValue()));
         }
-
+        call.setInvoiceDate(invoiceDate);
         if (row.getCell(2).getCellType() == CellType.STRING) {
             call.setCallTime(row.getCell(2).getStringCellValue());
         } else {

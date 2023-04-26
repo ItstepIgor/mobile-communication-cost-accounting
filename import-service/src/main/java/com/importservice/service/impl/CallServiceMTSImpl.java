@@ -39,14 +39,16 @@ public class CallServiceMTSImpl implements CallServiceMTS {
     public void saveToDataBaseFromFileMTS(ReportMTS reportMTS) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-        List<Call> callList = fillingCallList(reportMTS, dateTimeFormatter);
+        LocalDate invoiceDate = LocalDate.parse(reportMTS.getB().get(0).getBd(), dateTimeFormatter);
+
+        List<Call> callList = fillingCallList(reportMTS, dateTimeFormatter, invoiceDate);
         callRepository.saveAll(callList);
         kafkaTemplate.send("callMTS", callListMapper.listCallToListCallDto(callList));
 
         List<TariffByNumber> tarriffList = fillingTariffList(reportMTS, dateTimeFormatter);
         tariffByNumberRepository.saveAll(tarriffList);
 
-        Map<String, Object> stringObjectMap = fillingExpensesByPhoneNumber(reportMTS, dateTimeFormatter);
+        Map<String, Object> stringObjectMap = fillingExpensesByPhoneNumber(reportMTS, invoiceDate);
         @SuppressWarnings("unchecked")
         List<AllExpensesByPhoneNumber> allExpensesByPhoneNumbers = (List<AllExpensesByPhoneNumber>) stringObjectMap.get("AllExpensesByPhoneNumber");
         allExpensesByPhoneNumberRepository.saveAll(allExpensesByPhoneNumbers);
@@ -56,9 +58,8 @@ public class CallServiceMTSImpl implements CallServiceMTS {
         allCallServiceRepository.saveAll(allCallServices);
     }
 
-    private Map<String, Object> fillingExpensesByPhoneNumber(ReportMTS reportMTS, DateTimeFormatter dateTimeFormatter) {
+    private Map<String, Object> fillingExpensesByPhoneNumber(ReportMTS reportMTS, LocalDate invoiceDate) {
         List<AllCallService> allCallServices = new ArrayList<>();
-        LocalDate date = LocalDate.parse(reportMTS.getB().get(0).getBd(), dateTimeFormatter);
         List<AllExpensesByPhoneNumber> allExpensesByPhoneNumbers = new ArrayList<>();
         MonthlyCallServiceMTS monthlyCallServiceMTS = reportMTS.getPod().get(0);
         List<MonthlyCallServiceByNumberMTS> monthlyCallServiceByNumberMTS = monthlyCallServiceMTS.getDs();
@@ -66,7 +67,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
             AllExpensesByPhoneNumber allExpensesByPhoneNumber = new AllExpensesByPhoneNumber();
             allExpensesByPhoneNumber.setNumber(monthlyCallServiceByNumber.getN());
             allExpensesByPhoneNumber.setOwner(monthlyCallServiceByNumber.getU());
-            allExpensesByPhoneNumber.setInvoiceDate(date);
+            allExpensesByPhoneNumber.setInvoiceDate(invoiceDate);
             allExpensesByPhoneNumber.setSum(BigDecimal.valueOf(Double.parseDouble(monthlyCallServiceByNumber.getAwt())));
             allExpensesByPhoneNumber.setSumWithNDS(BigDecimal.valueOf(Double.parseDouble(monthlyCallServiceByNumber.getA())));
 
@@ -77,11 +78,11 @@ public class CallServiceMTSImpl implements CallServiceMTS {
             for (CostMonthlyCallServiceByNumberMTS costMonthlyCallServiceByNumber : costMonthlyCallServiceByNumberMTS) {
                 allCallService.setCallTime("00:00");
                 allCallService.setCallServiceName(costMonthlyCallServiceByNumber.getN());
-                allCallService.setInvoiceDate(date);
+                allCallService.setInvoiceDate(invoiceDate);
                 allCallService.setSum(BigDecimal.valueOf(Double.parseDouble(costMonthlyCallServiceByNumber.getAwt())));
                 allCallService.setSumWithNDS(BigDecimal.valueOf(Double.parseDouble(costMonthlyCallServiceByNumber.getA())));
                 allCallService.setMobileOperator(2);
-                allCallService.setOneTimeCallService(true);
+                allCallService.setOneTimeCallService(false);
                 List<TaxMonthlyCallServiceByNumberMTS> taxMonthlyCallServiceByNumbersMTS = costMonthlyCallServiceByNumber.getT();
                 for (TaxMonthlyCallServiceByNumberMTS taxMonthlyCallServiceByNumberMTS : taxMonthlyCallServiceByNumbersMTS) {
                     allCallService.setVatTax(taxMonthlyCallServiceByNumberMTS.getTr());
@@ -115,7 +116,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
         return tarriffList;
     }
 
-    private List<Call> fillingCallList(ReportMTS reportMTS, DateTimeFormatter dateTimeFormatter) {
+    private List<Call> fillingCallList(ReportMTS reportMTS, DateTimeFormatter dateTimeFormatter, LocalDate invoiceDate) {
         List<Call> callList = new ArrayList<>();
         List<CallsFromNumberMTS> reportMTSNd = reportMTS.getNd();
         for (CallsFromNumberMTS callsFromNumberMTS : reportMTSNd) {
@@ -127,6 +128,7 @@ public class CallServiceMTSImpl implements CallServiceMTS {
                     continue;
                 }
                 call.setCallDateTime(LocalDateTime.parse(callMTS.getD(), dateTimeFormatter));
+                call.setInvoiceDate(invoiceDate);
                 call.setCallService(callMTS.getZv());
                 call.setCode(callMTS.getS());
                 call.setCallTime(callMTS.getDu());

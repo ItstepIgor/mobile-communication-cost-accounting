@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -28,6 +29,9 @@ public class Call {
 
     @Column(nullable = false)
     private LocalDateTime callDateTime;
+
+    @Column(nullable = false)
+    private LocalDate invoiceDate;
 
     private String code;
 

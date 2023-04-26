@@ -20,7 +20,7 @@ public interface ImportFeignClients {
                                                                              fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
                                                                      LocalDate date);
 
-    @GetMapping("/calls/expenses")
+    @GetMapping("/calls/expensesmts")
     ResponseEntity<List<AllExpensesByPhoneNumberDTO>> findAllExpensesByPhoneNumberMTS(@RequestParam(value = "date")
                                                                                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                                                            fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})

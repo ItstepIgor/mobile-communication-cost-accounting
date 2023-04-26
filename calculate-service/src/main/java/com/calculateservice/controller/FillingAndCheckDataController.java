@@ -1,8 +1,8 @@
 package com.calculateservice.controller;
 
 import com.calculateservice.dto.AllCallServiceDTO;
-import com.calculateservice.service.CheckDataService;
 import com.calculateservice.service.FillingDataBaseService;
+import com.calculateservice.service.IndividualResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +21,8 @@ import java.util.List;
 public class FillingAndCheckDataController {
 
     private final FillingDataBaseService fillingDataBaseService;
-    private final CheckDataService checkDataService;
+
+    private final IndividualResultService individualResultService;
 
     //    @CrossOrigin
 
@@ -39,7 +40,7 @@ public class FillingAndCheckDataController {
     }
 
     @Operation(
-            summary = "Проверка стоимости ежемесячных сервисов",
+            summary = "Заменить этот метод на другой необходимый",
             description = "Вызывается метод сверяющий а/п ежемесячных сервисов с текущей и возвращает список отличающихся а/п "
     )
     @GetMapping("/check")
@@ -48,6 +49,11 @@ public class FillingAndCheckDataController {
                                                                       fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
                                                               @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                                                               LocalDate date) {
-        return checkDataService.checkSumMonthlyCallService(date);
+        return null;
+    }
+
+    @GetMapping("/calc")
+    public void calculateResult(){
+        individualResultService.calcResult();
     }
 }

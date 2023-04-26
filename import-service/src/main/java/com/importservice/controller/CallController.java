@@ -3,7 +3,7 @@ package com.importservice.controller;
 import com.importservice.dto.AllCallServiceDTO;
 import com.importservice.dto.AllExpensesByPhoneNumberDTO;
 import com.importservice.service.AllCallServiceService;
-import com.importservice.service.FindAllCallServiceMTS;
+import com.importservice.service.FindAllInformationOnMTS;
 import com.importservice.service.ImportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,7 +27,7 @@ public class CallController {
 
     private final ImportService importService;
     private final AllCallServiceService allCallServiceService;
-    private final FindAllCallServiceMTS findAllCallServiceMTS;
+    private final FindAllInformationOnMTS findAllInformationOnMTS;
 
     @GetMapping("/check")
     public String check() {
@@ -39,9 +39,14 @@ public class CallController {
             summary = "Импорт данных",
             description = "Вызывается метод заполнения данных по номерам телефонов и услугам"
     )
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/importa1", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadZipFile(@RequestParam("file") @Parameter(description = "Загружаем файл ZIP") MultipartFile file) {
         importService.importA1(file);
+    }
+
+    @PostMapping(value = "/importmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void importMTS(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
+        importService.importMTS(file);
     }
 
     @Operation(
@@ -57,21 +62,18 @@ public class CallController {
         return allCallServiceService.findAllByDate(date);
     }
 
+
     @Operation(
-            summary = "Для получения информации по всем начислениям МТС",
-            description = "Получение информации по всем начислениям МТС из БД "
+            summary = "Для получения информации по расходам па номерам МТС",
+            description = "Получение информации по расходам па номерам МТС из БД "
     )
-    @GetMapping("/expenses")
+    @GetMapping("/expensesmts")
     public List<AllExpensesByPhoneNumberDTO> findAllExpensesByPhoneNumberMTS(@RequestParam(value = "date")
                                                                           @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
                                                                                   fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
                                                                           @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                                                                           LocalDate date) {
-        return findAllCallServiceMTS.findAllByDate(date);
+        return findAllInformationOnMTS.findAllByDate(date);
     }
 
-    @PostMapping(value = "/importmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void importMTS(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
-        importService.importMTS(file);
-    }
 }

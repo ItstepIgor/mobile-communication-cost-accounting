@@ -43,19 +43,16 @@ public class AllCallServiceServiceImpl implements AllCallServiceService {
 
     @SneakyThrows
     @Transactional
-    public void createCallService(XSSFWorkbook myExcelBook) {
+    public void createCallService(XSSFWorkbook myExcelBook, LocalDate invoiceDate) {
         log.info(String.valueOf(LocalDateTime.now()));
-        allCallServiceRepository.saveAll(readServiceFromExcel(myExcelBook));
+        allCallServiceRepository.saveAll(readServiceFromExcel(myExcelBook, invoiceDate));
     }
 
-    private List<AllCallService> readServiceFromExcel(XSSFWorkbook myExcelBook) {
+    private List<AllCallService> readServiceFromExcel(XSSFWorkbook myExcelBook, LocalDate invoiceDate) {
         List<AllCallService> calls = new ArrayList<>();
         Set<String> oneTimeCallServiceName = findOneTimeCallServiceName();
         XSSFSheet myExcelSheet = myExcelBook.getSheet("Page4");
-        XSSFRow xssfRow = myExcelSheet.getRow(4);
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-        LocalDate invoiceDate = LocalDate.parse(xssfRow.getCell(1)
-                .getStringCellValue().substring(0, 10), dateTimeFormatter);
+
         String ownerNumberTemp = "";
 
         for (int i = 7; i < myExcelSheet.getLastRowNum(); i++) {

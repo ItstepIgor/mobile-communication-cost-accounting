@@ -2,7 +2,7 @@ package com.importservice.service.impl;
 
 import com.importservice.dto.AllExpensesByPhoneNumberDTO;
 import com.importservice.reposiitory.AllExpensesByPhoneNumberRepository;
-import com.importservice.service.FindAllCallServiceMTS;
+import com.importservice.service.FindAllInformationOnMTS;
 import com.importservice.service.mapper.AllExpensesByPhoneNumberListMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class FindAllCallServiceMTSImpl implements FindAllCallServiceMTS {
+public class FindAllInformationOnMTSImpl implements FindAllInformationOnMTS {
 
     private final AllExpensesByPhoneNumberRepository allExpensesByPhoneNumberRepository;
 

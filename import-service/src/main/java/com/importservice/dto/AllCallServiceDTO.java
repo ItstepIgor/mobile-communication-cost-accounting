@@ -28,5 +28,9 @@ public class AllCallServiceDTO {
 
     private BigDecimal sum;
 
+    private BigDecimal sumWithNDS;
+
+    private int mobileOperator;
+
     private Boolean oneTimeCallService;
 }

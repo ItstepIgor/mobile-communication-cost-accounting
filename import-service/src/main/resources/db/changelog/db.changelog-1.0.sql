@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS calls
     owner_number    VARCHAR(255)   NOT NULL,
     call_service    VARCHAR(255)   NOT NULL,
     call_date_time  TIMESTAMP      NOT NULL,
+    invoice_date    DATE           NOT NULL,
     code            VARCHAR(40),
     call_time       VARCHAR(20)    NOT NULL,
     number          VARCHAR(32)    NOT NULL,

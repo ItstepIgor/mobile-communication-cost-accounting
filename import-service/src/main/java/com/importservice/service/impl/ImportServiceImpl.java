@@ -6,11 +6,15 @@ import com.importservice.util.Unmarshaller;
 import com.importservice.xml.ReportMTS;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 @Service
 @RequiredArgsConstructor
@@ -34,9 +38,16 @@ public class ImportServiceImpl implements ImportService {
         try (InputStream inputStream = Extractor.extractZip(file)) {
             myExcelBook = new XSSFWorkbook(inputStream);
         }
+
+        XSSFSheet myExcelSheet1 = myExcelBook.getSheet("Page4");
+        XSSFRow xssfRow = myExcelSheet1.getRow(4);
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        LocalDate invoiceDate = LocalDate.parse(xssfRow.getCell(1)
+                .getStringCellValue().substring(0, 10), dateTimeFormatter);
+
         periodService.saveImportPeriodA1(myExcelBook);
-        callService.createCall(myExcelBook);
-        allCallServiceService.createCallService(myExcelBook);
+        callService.createCall(myExcelBook, invoiceDate);
+        allCallServiceService.createCallService(myExcelBook, invoiceDate);
     }
 
     @Override

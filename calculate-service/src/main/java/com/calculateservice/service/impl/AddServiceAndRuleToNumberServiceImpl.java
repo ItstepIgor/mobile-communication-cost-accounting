@@ -47,7 +47,7 @@ public class AddServiceAndRuleToNumberServiceImpl implements AddServiceAndRuleTo
 
         PhoneNumber phoneNumber = getPhoneNumber(964L);
 
-        phoneNumber.addMonthlyCallService(monthlyCallService);
+//        phoneNumber.addMonthlyCallService(monthlyCallService);
 
         phoneNumberRepository.save(phoneNumber);
 

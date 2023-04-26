@@ -1,10 +1,12 @@
 package com.calculateservice.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -12,28 +14,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "monthly_call_service")
-public class MonthlyCallService {
+@Table(name = "individual_result")
+public class IndividualResult {
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
-    private String monthlyCallServiceName;
 
     @Column(nullable = false)
-    private String vatTax;
-
-    @Column(nullable = false)
-    private LocalDate invoiceDate;
-
-    @Column(nullable = false)
-    private BigDecimal sum;
-
-    @Column(name = "sum_with_nds", nullable = false)
-    private BigDecimal sumWithNDS;
+    private String ownerName;
 
     @Column(nullable = false)
     private LocalDateTime creationDate;
+
+    @Column(nullable = false)
+    private BigDecimal sum;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "number_id", nullable = false)

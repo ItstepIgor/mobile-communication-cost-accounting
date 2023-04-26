@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface AllCallServiceService {
 
-    void createCallService(XSSFWorkbook myExcelBook);
+    void createCallService(XSSFWorkbook myExcelBook, LocalDate invoiceDate);
 
     List<AllCallServiceDTO> findAllByDate(LocalDate date);
 }
