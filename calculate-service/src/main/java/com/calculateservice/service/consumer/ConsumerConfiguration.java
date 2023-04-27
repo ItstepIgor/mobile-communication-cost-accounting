@@ -1,6 +1,6 @@
 package com.calculateservice.service.consumer;
 
-import com.calculateservice.dto.CallDto;
+import com.calculateservice.dto.CallDTO;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -37,19 +37,19 @@ public class ConsumerConfiguration {
     }
 
     @Bean
-    public ConsumerFactory<String, List<CallDto>> consumerFactory(ObjectMapper objectMapper) {
+    public ConsumerFactory<String, List<CallDTO>> consumerFactory(ObjectMapper objectMapper) {
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         config.put(ConsumerConfig.MAX_PARTITION_FETCH_BYTES_CONFIG, maxPartitionFetchBytes);
         config.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, fetchMaxBytes);
-        JavaType type = objectMapper.getTypeFactory().constructParametricType(List.class, CallDto.class);
+        JavaType type = objectMapper.getTypeFactory().constructParametricType(List.class, CallDTO.class);
         return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
                 new JsonDeserializer<>(type, objectMapper, false));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, List<CallDto>> callListener(ObjectMapper objectMapper) {
-        ConcurrentKafkaListenerContainerFactory<String, List<CallDto>> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, List<CallDTO>> callListener(ObjectMapper objectMapper) {
+        ConcurrentKafkaListenerContainerFactory<String, List<CallDTO>> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory(objectMapper));
         return factory;
     }

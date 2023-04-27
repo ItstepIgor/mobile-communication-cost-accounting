@@ -1,6 +1,6 @@
 package com.calculateservice.service.consumer;
 
-import com.calculateservice.dto.CallDto;
+import com.calculateservice.dto.CallDTO;
 import com.calculateservice.service.CallService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -15,12 +15,12 @@ public class Consumer {
     private final CallService callService;
 
     @KafkaListener(topics = "callA1", groupId = "default", containerFactory = "callListener")
-    void listenerA1(List<CallDto> data) {
+    void listenerA1(List<CallDTO> data) {
         callService.createCall(data);
     }
 
     @KafkaListener(topics = "callMTS", groupId = "default", containerFactory = "callListener")
-    void listenerMTS(List<CallDto> data) {
+    void listenerMTS(List<CallDTO> data) {
         callService.createCall(data);
     }
 }

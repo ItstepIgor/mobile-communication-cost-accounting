@@ -12,8 +12,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"ruleOneTimeCallServices", "monthlyCallServices"})
-@EqualsAndHashCode(exclude = {"ruleOneTimeCallServices" , "monthlyCallServices"})
+@ToString(exclude = {"ruleOneTimeCallServices", "monthlyCallServices", "results"})
+@EqualsAndHashCode(exclude = {"ruleOneTimeCallServices" , "monthlyCallServices", "results"})
 @Entity
 @Table(name = "phone_number")
 public class PhoneNumber {
@@ -41,7 +41,7 @@ public class PhoneNumber {
     List<MonthlyCallService> monthlyCallServices;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "phoneNumber")
-    List<IndividualResult> individualResults;
+    List<Result> results;
 
 
     @ManyToMany(fetch = FetchType.LAZY)

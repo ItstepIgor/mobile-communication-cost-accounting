@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CallDto {
+public class CallDTO {
     private String ownerNumber;
     private String callService;
     private LocalDateTime callDateTime;

@@ -1,6 +1,6 @@
 package com.calculateservice.service.impl;
 
-import com.calculateservice.dto.CallDto;
+import com.calculateservice.dto.CallDTO;
 import com.calculateservice.entity.Call;
 import com.calculateservice.repository.CallRepository;
 import com.calculateservice.service.CallService;
@@ -21,8 +21,8 @@ public class CallServiceImpl implements CallService {
     private final CallListMapper callListMapper;
 
     @Override
-    public void createCall(List<CallDto> calls) {
-        callRepository.saveAll(callListMapper.listCallDtoToListCall(calls));
+    public void createCall(List<CallDTO> calls) {
+        callRepository.saveAll(callListMapper.toListEntity(calls));
     }
 
     @Override
