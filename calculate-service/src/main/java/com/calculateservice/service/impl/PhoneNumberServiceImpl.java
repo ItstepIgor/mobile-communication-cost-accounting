@@ -18,4 +18,9 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
     public List<PhoneNumber> findAll() {
         return phoneNumberRepository.findAll();
     }
+
+    @Override
+    public PhoneNumber findById(Long id) {
+        return phoneNumberRepository.findById(id).orElse(null);
+    }
 }

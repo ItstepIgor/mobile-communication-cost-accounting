@@ -83,7 +83,7 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
     }
 
     private void createMonthlyCallService(List<AllCallServiceDTO> allCallServiceDTOS) {
-        Set<MonthlyCallService> monthlyCallServices = new HashSet<>();
+        List<MonthlyCallService> monthlyCallServices = new ArrayList<>();
 
         List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAll();
 

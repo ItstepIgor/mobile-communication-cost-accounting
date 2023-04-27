@@ -2,7 +2,7 @@ package com.calculateservice.controller;
 
 import com.calculateservice.dto.AllCallServiceDTO;
 import com.calculateservice.service.FillingDataBaseService;
-import com.calculateservice.service.IndividualResultService;
+import com.calculateservice.service.ResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +22,7 @@ public class FillingAndCheckDataController {
 
     private final FillingDataBaseService fillingDataBaseService;
 
-    private final IndividualResultService individualResultService;
+    private final ResultService resultService;
 
     //    @CrossOrigin
 
@@ -52,8 +52,17 @@ public class FillingAndCheckDataController {
         return null;
     }
 
+
+    @Operation(
+            summary = "Провести итоговый расчет",
+            description = "Вызывается метод и выполняется расчет удержания по всем номерам телефонов с указанием даты"
+    )
     @GetMapping("/calc")
-    public void calculateResult(){
-        individualResultService.calcResult();
+    public void calculateResult(@RequestParam(value = "date")
+                                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
+                                        fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
+                                @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
+                                LocalDate date) {
+        resultService.calcResult(date);
     }
 }

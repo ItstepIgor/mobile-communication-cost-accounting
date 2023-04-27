@@ -70,12 +70,13 @@ public class CallServiceMTSImpl implements CallServiceMTS {
             allExpensesByPhoneNumber.setInvoiceDate(invoiceDate);
             allExpensesByPhoneNumber.setSum(BigDecimal.valueOf(Double.parseDouble(monthlyCallServiceByNumber.getAwt())));
             allExpensesByPhoneNumber.setSumWithNDS(BigDecimal.valueOf(Double.parseDouble(monthlyCallServiceByNumber.getA())));
-
-            AllCallService allCallService = new AllCallService();
-            allCallService.setNumber(Long.parseLong(monthlyCallServiceByNumber.getN().substring(3, 12)));
-            allCallService.setOwnerNumber(monthlyCallServiceByNumber.getU());
+            long numberTemp = Long.parseLong(monthlyCallServiceByNumber.getN().substring(3, 12));
+            String ownerNumberTemp = monthlyCallServiceByNumber.getU();
             List<CostMonthlyCallServiceByNumberMTS> costMonthlyCallServiceByNumberMTS = monthlyCallServiceByNumber.getI();
             for (CostMonthlyCallServiceByNumberMTS costMonthlyCallServiceByNumber : costMonthlyCallServiceByNumberMTS) {
+                AllCallService allCallService = new AllCallService();
+                allCallService.setNumber(numberTemp);
+                allCallService.setOwnerNumber(ownerNumberTemp);
                 allCallService.setCallTime("00:00");
                 allCallService.setCallServiceName(costMonthlyCallServiceByNumber.getN());
                 allCallService.setInvoiceDate(invoiceDate);

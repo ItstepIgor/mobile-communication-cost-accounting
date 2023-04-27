@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "individual_result")
-public class IndividualResult {
+@Table(name = "result")
+public class Result {
 
 
     @Id
