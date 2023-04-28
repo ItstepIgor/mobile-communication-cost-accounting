@@ -12,6 +12,7 @@ import java.util.List;
 @ToString(exclude = {"ruleOneTimeCallServices"})
 @Builder
 @Entity
+@Table(name = "one_time_call_service")
 public class OneTimeCallService {
 
     @Id
@@ -19,8 +20,7 @@ public class OneTimeCallService {
     private long id;
     @Column(nullable = false)
     private String oneTimeCallServiceName;
-
-    @Column(nullable = false)
+    @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "oneTimeCallService")

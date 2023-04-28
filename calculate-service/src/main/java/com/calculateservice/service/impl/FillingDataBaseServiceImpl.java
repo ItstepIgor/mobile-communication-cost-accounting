@@ -69,11 +69,9 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .filter(AllCallServiceDTO::getOneTimeCallService)
                 .filter(allCallServiceDTO -> !oneTimeCallServiceName.contains(allCallServiceDTO.getCallServiceName()))
                 .forEach(allCallServiceDTO -> {
-                    OneTimeCallService oneTimeCallService = new OneTimeCallService();
-                    oneTimeCallService.setOneTimeCallServiceName(allCallServiceDTO.getCallServiceName());
-                    //TODO при импорте не создается по умолчанию дата и время в
-                    // базе данных разобраться в причине
-//                    oneTimeCallService.setCreationDate(LocalDateTime.now());
+                    OneTimeCallService oneTimeCallService = OneTimeCallService.builder()
+                            .oneTimeCallServiceName(allCallServiceDTO.getCallServiceName())
+                            .build();
                     oneTimeCallServices.add(oneTimeCallService);
                 });
 
