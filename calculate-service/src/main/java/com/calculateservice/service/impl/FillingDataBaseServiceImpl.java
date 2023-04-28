@@ -5,6 +5,7 @@ import com.calculateservice.dto.AllExpensesByPhoneNumberDTO;
 import com.calculateservice.entity.*;
 import com.calculateservice.repository.*;
 import com.calculateservice.service.FillingDataBaseService;
+import com.calculateservice.service.MobileOperatorService;
 import com.calculateservice.util.ImportFeignClients;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
 
     private final GroupNumberRepository groupNumberRepository;
 
-    private final MobileOperatorRepository mobileOperatorRepository;
+    private final MobileOperatorService mobileOperatorService;
 
 
     public void fillingDataBase(LocalDate date) {
@@ -70,7 +71,9 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .forEach(allCallServiceDTO -> {
                     OneTimeCallService oneTimeCallService = new OneTimeCallService();
                     oneTimeCallService.setOneTimeCallServiceName(allCallServiceDTO.getCallServiceName());
-                    oneTimeCallService.setCreationDate(LocalDateTime.now());
+                    //TODO при импорте не создается по умолчанию дата и время в
+                    // базе данных разобраться в причине
+//                    oneTimeCallService.setCreationDate(LocalDateTime.now());
                     oneTimeCallServices.add(oneTimeCallService);
                 });
 
@@ -141,8 +144,8 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                     phoneNumber.setNumber(allCallServiceDTO.getNumber());
                     phoneNumber.setCreationDate(LocalDateTime.now());
                     phoneNumber.setGroupNumber(groupNumberRepository.findById(7L).orElse(null));
-                    phoneNumber.setMobileOperator(mobileOperatorRepository
-                            .findById((long) allCallServiceDTO.getMobileOperator()).orElse(null));
+                    phoneNumber.setMobileOperator(mobileOperatorService
+                            .findById(allCallServiceDTO.getMobileOperator()));
                     phoneNumbers.add(phoneNumber);
                 });
 
