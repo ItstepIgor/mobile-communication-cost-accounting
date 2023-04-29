@@ -45,23 +45,3 @@ ALTER TABLE IF EXISTS individual_result
 
 ALTER TABLE IF EXISTS phone_number
     ADD CONSTRAINT FK_phone_number_mobile_operator FOREIGN KEY (mobile_operator_id) REFERENCES mobile_operator;
-
---changeset igor:2
-
-CREATE OR REPLACE FUNCTION date_now()
-    RETURNS trigger
-    LANGUAGE plpgsql AS
-$func$
-BEGIN
-    NEW.creation_date := now();
-    RETURN NEW;
-END
-$func$;
-
---changeset igor:3
-
-CREATE TRIGGER one_time_call_service_table_before_insert
-    BEFORE INSERT ON one_time_call_service
-    FOR EACH ROW
-    WHEN (NEW.creation_date IS NULL)
-EXECUTE FUNCTION date_now();

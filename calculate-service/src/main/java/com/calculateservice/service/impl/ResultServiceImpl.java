@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +37,6 @@ public class ResultServiceImpl implements ResultService {
         List<PhoneNumber> phoneNumbers = phoneNumberService.findAll();
 
         for (PhoneNumber phoneNumber : phoneNumbers) {
-            Result result = new Result();
             BigDecimal callSum = allCalcByDate.stream()
                     .filter(call -> call.getShortNumber() == (phoneNumber.getNumber()))
                     .map(Call::getSum)
@@ -51,10 +49,11 @@ public class ResultServiceImpl implements ResultService {
             //TODO сделать константу размер НДС (0.25) или 25%
             BigDecimal callSumWithNDS = callSum.multiply(BigDecimal.valueOf(0.25)).add(callSum);
 
-            result.setOwnerName(String.valueOf(phoneNumber.getNumber()));
-            result.setPhoneNumber(phoneNumberService.findById(phoneNumber.getId()));
-            result.setSum(callSumWithNDS.add(callServiceSum));
-            result.setCreationDate(LocalDateTime.now());
+            Result result = Result.builder()
+                    .ownerName(String.valueOf(phoneNumber.getNumber()))
+                    .phoneNumber(phoneNumberService.findById(phoneNumber.getId()))
+                    .sum(callSumWithNDS.add(callServiceSum))
+                    .build();
             results.add(result);
         }
         resultRepository.saveAll(results);

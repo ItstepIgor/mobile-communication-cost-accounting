@@ -2,18 +2,52 @@
 
 --changeset igor:1
 
-INSERT INTO mobile_operator (id, operator_name)
-VALUES (1, 'A1'),
-       (2, 'MTS');
-
+CREATE OR REPLACE FUNCTION date_now()
+       RETURNS trigger
+       LANGUAGE plpgsql AS
+$func$
+BEGIN
+       NEW.creation_date := now();
+       RETURN NEW;
+END
+$func$;
 
 --changeset igor:2
 
-INSERT INTO  group_number (id, group_number_name)
-VALUES (1, 'Руководители'),
-       (2, 'Специалисты'),
-       (3, 'Дежурные службы'),
-       (4, 'Водители легковых автомобилей'),
-       (5, 'Водители грузовых автомобилей'),
-       (6, 'Удерживаем все'),
-       (7, 'Общая группа');
+CREATE TRIGGER one_time_call_service_table_before_insert
+       BEFORE INSERT ON one_time_call_service
+       FOR EACH ROW
+       WHEN (NEW.creation_date IS NULL)
+EXECUTE FUNCTION date_now();
+
+--changeset igor:3
+
+CREATE TRIGGER phone_number_table_before_insert
+       BEFORE INSERT ON phone_number
+       FOR EACH ROW
+       WHEN (NEW.creation_date IS NULL)
+EXECUTE FUNCTION date_now();
+
+--changeset igor:4
+
+CREATE TRIGGER monthly_call_service_table_before_insert
+       BEFORE INSERT ON monthly_call_service
+       FOR EACH ROW
+       WHEN (NEW.creation_date IS NULL)
+EXECUTE FUNCTION date_now();
+
+--changeset igor:5
+
+CREATE TRIGGER result_table_before_insert
+       BEFORE INSERT ON result
+       FOR EACH ROW
+       WHEN (NEW.creation_date IS NULL)
+EXECUTE FUNCTION date_now();
+
+--changeset igor:6
+
+CREATE TRIGGER individual_result_table_before_insert
+       BEFORE INSERT ON individual_result
+       FOR EACH ROW
+       WHEN (NEW.creation_date IS NULL)
+EXECUTE FUNCTION date_now();

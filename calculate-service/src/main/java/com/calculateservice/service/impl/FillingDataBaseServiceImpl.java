@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -98,17 +97,17 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .filter(allCallServiceDTO -> !allCallServiceDTO.getOneTimeCallService())
                 .filter(allCallServiceDTO -> !monthlyCallServiceName.contains(allCallServiceDTO.getCallServiceName()))
                 .forEach(allCallServiceDTO -> {
-                    MonthlyCallService monthlyCallService = new MonthlyCallService();
-                    monthlyCallService.setMonthlyCallServiceName(allCallServiceDTO.getCallServiceName());
-                    monthlyCallService.setCreationDate(LocalDateTime.now());
-                    monthlyCallService.setVatTax(allCallServiceDTO.getVatTax());
-                    monthlyCallService.setInvoiceDate(allCallServiceDTO.getInvoiceDate());
-                    monthlyCallService.setPhoneNumber(phoneNumbers.stream()
-                            .filter(phoneNumber -> phoneNumber.getNumber() == allCallServiceDTO.getNumber())
-                            .findFirst().orElse(null));
+                    MonthlyCallService monthlyCallService = MonthlyCallService.builder()
+                            .monthlyCallServiceName(allCallServiceDTO.getCallServiceName())
+                            .vatTax(allCallServiceDTO.getVatTax())
+                            .invoiceDate(allCallServiceDTO.getInvoiceDate())
+                            .phoneNumber(phoneNumbers.stream()
+                                    .filter(phoneNumber -> phoneNumber.getNumber() == allCallServiceDTO.getNumber())
+                                    .findFirst().orElse(null))
+                            .sum(allCallServiceDTO.getSum())
+                            .sumWithNDS(allCallServiceDTO.getSumWithNDS())
+                            .build();
                     //TODO написать и обработать свою ошибку (orElseThrow()) в случае отсутствия номера
-                    monthlyCallService.setSum(allCallServiceDTO.getSum());
-                    monthlyCallService.setSumWithNDS(allCallServiceDTO.getSumWithNDS());
                     monthlyCallServices.add(monthlyCallService);
                 });
         monthlyCallServiceRepository.saveAll(monthlyCallServices);
@@ -138,12 +137,12 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .filter(distinctByField(AllCallServiceDTO::getNumber))
                 .filter(allCallServiceDTO -> !phoneNumberName.contains(allCallServiceDTO.getNumber()))
                 .forEach(allCallServiceDTO -> {
-                    PhoneNumber phoneNumber = new PhoneNumber();
-                    phoneNumber.setNumber(allCallServiceDTO.getNumber());
-                    phoneNumber.setCreationDate(LocalDateTime.now());
-                    phoneNumber.setGroupNumber(groupNumberRepository.findById(7L).orElse(null));
-                    phoneNumber.setMobileOperator(mobileOperatorService
-                            .findById(allCallServiceDTO.getMobileOperator()));
+                    PhoneNumber phoneNumber = PhoneNumber.builder()
+                            .number(allCallServiceDTO.getNumber())
+                            .groupNumber(groupNumberRepository.findById(7L).orElse(null))
+                            .mobileOperator(mobileOperatorService
+                                    .findById(allCallServiceDTO.getMobileOperator()))
+                            .build();
                     phoneNumbers.add(phoneNumber);
                 });
 
