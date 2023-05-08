@@ -33,11 +33,11 @@ public class AddServiceAndRuleToNumberServiceImpl implements AddServiceAndRuleTo
 //                .build();
 //        ruleOneTimeCallServiceRepository.save(ruleOneTimeCallServices);
 
-        PhoneNumber phoneNumber = getPhoneNumber(964L);
+        GroupNumber groupNumber = getGroupNumber(7L);
 
-        phoneNumber.addRule(ruleOneTimeCallServices);
+        groupNumber.addRule(ruleOneTimeCallServices);
 
-        phoneNumberRepository.save(phoneNumber);
+        groupNumberRepository.save(groupNumber);
     }
 
     @Override
@@ -45,11 +45,11 @@ public class AddServiceAndRuleToNumberServiceImpl implements AddServiceAndRuleTo
 
         MonthlyCallService monthlyCallService = getMonthlyCallService(78L);
 
-        PhoneNumber phoneNumber = getPhoneNumber(964L);
+        GroupNumber groupNumber = getGroupNumber(7L);
 
 //        phoneNumber.addMonthlyCallService(monthlyCallService);
 
-        phoneNumberRepository.save(phoneNumber);
+        groupNumberRepository.save(groupNumber);
 
     }
 

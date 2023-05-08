@@ -11,7 +11,7 @@ import java.util.Set;
 @NoArgsConstructor
 //При AllArgsConstructor коллекция инициализируется null и не работает @ManyToMany
 //@AllArgsConstructor
-@ToString(exclude = {"phoneNumbers"})
+@ToString(exclude = {"groupNumbers"})
 @Builder
 @Entity
 @Table(name = "rule_one_time_call_service")
@@ -21,13 +21,13 @@ public class RuleOneTimeCallService {
                                   OneTimeCallService oneTimeCallService,
                                   LocalTime startPayment,
                                   LocalTime endPayment,
-                                  Set<PhoneNumber> phoneNumbers) {
+                                  Set<GroupNumber> groupNumbers) {
         this.id = id;
         this.ruleName = ruleName;
         this.oneTimeCallService = oneTimeCallService;
         this.startPayment = startPayment;
         this.endPayment = endPayment;
-        this.phoneNumbers = new HashSet<>();
+        this.groupNumbers = new HashSet<>();
     }
 
     @Id
@@ -48,7 +48,7 @@ public class RuleOneTimeCallService {
 
 
     @ManyToMany(mappedBy = "ruleOneTimeCallServices", fetch = FetchType.LAZY)
-    private Set<PhoneNumber> phoneNumbers = new HashSet<>();
+    private Set<GroupNumber> groupNumbers = new HashSet<>();
 
 
     //методы нужны для добавления номеров к правилам из БД
