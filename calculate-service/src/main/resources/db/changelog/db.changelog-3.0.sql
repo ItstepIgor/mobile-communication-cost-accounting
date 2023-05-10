@@ -51,3 +51,11 @@ CREATE TRIGGER individual_result_table_before_insert
        FOR EACH ROW
        WHEN (NEW.creation_date IS NULL)
 EXECUTE FUNCTION date_now();
+
+--changeset igor:7
+
+CREATE TRIGGER monthly_call_service_list_table_before_insert
+       BEFORE INSERT ON monthly_call_service_list
+       FOR EACH ROW
+       WHEN (NEW.creation_date IS NULL)
+EXECUTE FUNCTION date_now();

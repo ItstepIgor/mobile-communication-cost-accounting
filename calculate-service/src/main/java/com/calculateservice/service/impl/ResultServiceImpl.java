@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,55 +35,67 @@ public class ResultServiceImpl implements ResultService {
 
         for (PhoneNumber phoneNumber : phoneNumbers) {
 
+            BigDecimal bigDecimalCallSum = new BigDecimal(0.0);
+            BigDecimal callServiceSum = monthlyCallServiceCalc(monthlyCallServiceByDate, phoneNumber);
 
-            BigDecimal callServiceSum = monthlyCallServiceByDate.stream()
-                    .filter(monthlyCallService -> monthlyCallService.getPhoneNumber().getNumber() == (phoneNumber.getNumber()))
-                    .map(MonthlyCallService::getSumWithNDS)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            double callSum = 0.0;
+            if (phoneNumber.getGroupNumber().getId() == 1) {
+                List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber());
+                for (RuleByNumber ruleByNumber : ruleByNumbers) {
+                    BigDecimal tempCallSum = allCalcByDate.stream()
+                            .filter(call -> call.getMobileOperator().equals("1"))
+                            .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
+                            .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                            .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getStartPayment()))
+                                    || (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getEndPayment())))
+                            .map(Call::getSum)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal callSum = BigDecimal.ZERO;
-
-//            List<String> ruleOneTimeCallServiceName = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber())
-//                    .stream()
-//                    .map(RuleByNumber::getOneTimeCallServiceName)
-//                    .toList();
-//            List<Call> callListByNumber = allCalcByDate.stream()
-//                    .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-//                    .filter(call -> ruleOneTimeCallServiceName.contains(call.getCallService()))
-//                    .toList();
-
-            List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber());
-            for (RuleByNumber ruleByNumber : ruleByNumbers) {
-                BigDecimal tempCallSum = allCalcByDate.stream()
+                    callSum += tempCallSum.doubleValue();
+                    //TODO сделать дополнительную таблицу для связи номеров с услугими за которые не нужно удерживать
+                    // возможно связь нужно делать с группами.
+                    // добавить запрос для вставки этой связи.
+                }
+                BigDecimal otherCallService = allCalcByDate.stream()
+                        .filter(call -> call.getMobileOperator().equals("1"))
                         .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-                        .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
-                        .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getStartPayment()))
-                                || (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getEndPayment())))
+                        .filter(call -> !ruleByNumbers
+                                .stream()
+                                .map(RuleByNumber::getOneTimeCallServiceName)
+                                .toList()
+                                .contains(call.getCallService()))
                         .map(Call::getSum)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
+                bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
 
-                callSum.add(tempCallSum);
-
-                //TODO 1191137 по этому номеру продолжить проверку (посмотреть какие праввила достаються
-                // разделить стрим и посмотреть какие данные выбираються или метод peek применить)
+            } else if ((phoneNumber.getGroupNumber().getId() == 2)
+                    || (phoneNumber.getGroupNumber().getId() == 4)) {
+                bigDecimalCallSum = allCalcByDate.stream()
+                        .filter(call -> call.getMobileOperator().equals("1"))
+                        .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
+                        .map(Call::getSum)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
 
 
-//            BigDecimal callSum = callListByNumber.stream()
-//                    .filter(call -> call.getShortNumber() == (phoneNumber.getNumber()))
-//                    .map(Call::getSum)
-//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
             //TODO сделать константу размер НДС (0.25) или 25%
-            BigDecimal callSumWithNDS = callSum.multiply(BigDecimal.valueOf(0.25)).add(callSum);
+            BigDecimal callSumWithNDS = bigDecimalCallSum.multiply(BigDecimal.valueOf(0.25)).add(bigDecimalCallSum);
 
             Result result = Result.builder()
                     .ownerName(String.valueOf(phoneNumber.getNumber()))
                     .phoneNumber(phoneNumberService.findById(phoneNumber.getId()))
-                    .sum(callSumWithNDS.add(callServiceSum))
+                    .sum(callSumWithNDS/*.add(callServiceSum)*/)
                     .build();
             results.add(result);
         }
         resultRepository.saveAll(results);
+    }
+
+    private BigDecimal monthlyCallServiceCalc(List<MonthlyCallService> monthlyCallServiceByDate, PhoneNumber phoneNumber) {
+        BigDecimal callServiceSum = monthlyCallServiceByDate.stream()
+                .filter(monthlyCallService -> monthlyCallService.getPhoneNumber().getNumber() == (phoneNumber.getNumber()))
+                .map(MonthlyCallService::getSumWithNDS)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return callServiceSum;
     }
 }

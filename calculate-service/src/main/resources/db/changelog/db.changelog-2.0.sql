@@ -33,3 +33,10 @@ ALTER TABLE IF EXISTS individual_result
 
 ALTER TABLE IF EXISTS phone_number
     ADD CONSTRAINT FK_phone_number_mobile_operator FOREIGN KEY (mobile_operator_id) REFERENCES mobile_operator;
+
+ALTER TABLE IF EXISTS phone_number_monthly_call_service_list
+    ADD CONSTRAINT FK_phone_number_rule_monthly_call_service_list_number FOREIGN KEY (number_id) REFERENCES phone_number;
+
+ALTER TABLE IF EXISTS phone_number_monthly_call_service_list
+    ADD CONSTRAINT FK_number_monthly_call_service_list_monthly_call_service_list FOREIGN KEY (monthly_call_service_list_id)
+        REFERENCES monthly_call_service_list;
