@@ -27,8 +27,6 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
 
     private final MonthlyCallServiceRepository monthlyCallServiceRepository;
 
-    private final MonthlyCallServiceListRepository monthlyCallServiceListRepository;
-
     private final PhoneNumberRepository phoneNumberRepository;
 
     private final GroupNumberRepository groupNumberRepository;
@@ -45,36 +43,10 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
 
         createMonthlyCallService(allCallServiceDTOS);
 
-        createMonthlyCallServiceList(allCallServiceDTOS);
 
         List<AllExpensesByPhoneNumberDTO> allExpensesByPhoneNumber = findAllExpensesByPhoneNumber(date);
     }
 
-    private void createMonthlyCallServiceList(List<AllCallServiceDTO> allCallServiceDTOS) {
-
-        Set<MonthlyCallServiceList> monthlyCallServicesList = new HashSet<>();
-        List<MonthlyCallServiceList> allMonthlyCallServiceList = findAllMonthlyCallServiceList();
-
-        Set<String> monthlyCallServiceName = allMonthlyCallServiceList.stream()
-                .map(MonthlyCallServiceList::getMonthlyCallServiceName)
-                .collect(Collectors.toSet());
-
-        allCallServiceDTOS.stream()
-                .filter(allCallServiceDTO -> !allCallServiceDTO.getOneTimeCallService())
-                .filter(allCallServiceDTO -> !monthlyCallServiceName.contains(allCallServiceDTO.getCallServiceName()))
-                .forEach(allCallServiceDTO -> {
-                    MonthlyCallServiceList monthlyCallService = MonthlyCallServiceList.builder()
-                            .monthlyCallServiceName(allCallServiceDTO.getCallServiceName())
-                            .build();
-                    monthlyCallServicesList.add(monthlyCallService);
-                });
-        monthlyCallServiceListRepository.saveAll(monthlyCallServicesList);
-    }
-
-    public List<MonthlyCallServiceList> findAllMonthlyCallServiceList() {
-
-        return monthlyCallServiceListRepository.findAll();
-    }
 
     private List<AllCallServiceDTO> findAllCommonCallService(LocalDate date) {
         return importFeignClients.findAllCommonCallService(date).getBody();
