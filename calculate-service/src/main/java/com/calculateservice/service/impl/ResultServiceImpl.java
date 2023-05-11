@@ -40,16 +40,7 @@ public class ResultServiceImpl implements ResultService {
                     .map(MonthlyCallService::getSumWithNDS)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            BigDecimal callSum = BigDecimal.ZERO;
-
-//            List<String> ruleOneTimeCallServiceName = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber())
-//                    .stream()
-//                    .map(RuleByNumber::getOneTimeCallServiceName)
-//                    .toList();
-//            List<Call> callListByNumber = allCalcByDate.stream()
-//                    .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-//                    .filter(call -> ruleOneTimeCallServiceName.contains(call.getCallService()))
-//                    .toList();
+            double callSum = 0.0;
 
             List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber());
             for (RuleByNumber ruleByNumber : ruleByNumbers) {
@@ -61,20 +52,15 @@ public class ResultServiceImpl implements ResultService {
                         .map(Call::getSum)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                callSum.add(tempCallSum);
-
-                //TODO 1191137 по этому номеру продолжить проверку (посмотреть какие праввила достаються
-                // разделить стрим и посмотреть какие данные выбираються или метод peek применить)
+                callSum += tempCallSum.doubleValue();
+                //TODO сделать дополнительную таблицу для связи номеров с услугими за которые не нужно удерживать
+                // возможно связь нужно делать с группами.
+                // добавить запрос для вставки этой связи.
             }
 
 
-//            BigDecimal callSum = callListByNumber.stream()
-//                    .filter(call -> call.getShortNumber() == (phoneNumber.getNumber()))
-//                    .map(Call::getSum)
-//                    .reduce(BigDecimal.ZERO, BigDecimal::add);
-
             //TODO сделать константу размер НДС (0.25) или 25%
-            BigDecimal callSumWithNDS = callSum.multiply(BigDecimal.valueOf(0.25)).add(callSum);
+            BigDecimal callSumWithNDS = BigDecimal.valueOf(callSum * 0.25 + callSum);
 
             Result result = Result.builder()
                     .ownerName(String.valueOf(phoneNumber.getNumber()))
