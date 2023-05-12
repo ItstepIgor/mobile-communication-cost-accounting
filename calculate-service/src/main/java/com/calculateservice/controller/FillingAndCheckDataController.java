@@ -2,6 +2,7 @@ package com.calculateservice.controller;
 
 import com.calculateservice.dto.AllCallServiceDTO;
 import com.calculateservice.service.FillingDataBaseService;
+import com.calculateservice.service.IndividualResultService;
 import com.calculateservice.service.ResultService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -23,6 +24,8 @@ public class FillingAndCheckDataController {
     private final FillingDataBaseService fillingDataBaseService;
 
     private final ResultService resultService;
+
+    private final IndividualResultService individualResultService;
 
     //    @CrossOrigin
 
@@ -64,5 +67,14 @@ public class FillingAndCheckDataController {
                                 @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
                                 LocalDate date) {
         resultService.calcResult(date);
+    }
+
+    @Operation(
+            summary = "Провести итоговый расчет по одному номеру",
+            description = "Вызывается метод и выполняется расчет удержания поодному номеру телефона"
+    )
+    @GetMapping("/calcindividul")
+    public void calculateIndividualResult(@RequestParam String number) {
+        individualResultService.calcIndividualResult(number);
     }
 }

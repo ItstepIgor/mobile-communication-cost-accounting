@@ -40,4 +40,7 @@ public class PhoneNumber {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "phoneNumber")
     List<Result> results;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "phoneNumber")
+    List<IndividualResult> individualResults;
 }

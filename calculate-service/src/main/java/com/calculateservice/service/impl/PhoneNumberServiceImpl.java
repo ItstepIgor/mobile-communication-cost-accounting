@@ -33,4 +33,9 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
         PhoneNumber phoneNumber = phoneNumberMapper.toEntity(phoneNumberDTO);
         phoneNumberRepository.save(phoneNumber);
     }
+
+    @Override
+    public PhoneNumber findPhoneNumberByNumber(Long number) {
+        return phoneNumberRepository.findPhoneNumberByNumber(number);
+    }
 }

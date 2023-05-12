@@ -12,4 +12,6 @@ public interface PhoneNumberService {
 
     void update (PhoneNumberDTO phoneNumberDto);
 
+    PhoneNumber findPhoneNumberByNumber(Long number);
+
 }

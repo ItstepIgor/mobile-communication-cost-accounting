@@ -34,41 +34,76 @@ public class ResultServiceImpl implements ResultService {
 
         for (PhoneNumber phoneNumber : phoneNumbers) {
 
+            BigDecimal bigDecimalCallSum = BigDecimal.valueOf(0.0);
 
-            BigDecimal callServiceSum = monthlyCallServiceByDate.stream()
-                    .filter(monthlyCallService -> monthlyCallService.getPhoneNumber().getNumber() == (phoneNumber.getNumber()))
-                    .map(MonthlyCallService::getSumWithNDS)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal callServiceSum = monthlyCallServiceCalc(monthlyCallServiceByDate, phoneNumber);
 
             double callSum = 0.0;
+            if (phoneNumber.getGroupNumber().getId() == 1) {
+                List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber());
+                for (RuleByNumber ruleByNumber : ruleByNumbers) {
+                    BigDecimal weekDaySum = allCalcByDate.stream()
+                            .filter(call -> call.getMobileOperator().equals("1"))
+                            .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
+                            .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                            .filter(call -> !(call.getDayOfWeek() == 6 || call.getDayOfWeek() == 7))
+                            .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getStartPayment()))
+                                    || (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getEndPayment())))
+                            .map(Call::getSum)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber());
-            for (RuleByNumber ruleByNumber : ruleByNumbers) {
-                BigDecimal tempCallSum = allCalcByDate.stream()
+                    BigDecimal weekEndSum = allCalcByDate.stream()
+                            .filter(call -> call.getMobileOperator().equals("1"))
+                            .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
+                            .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                            .filter(call -> (call.getDayOfWeek() == 6 || call.getDayOfWeek() == 7))
+                            .map(Call::getSum)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                    callSum += weekEndSum.add(weekDaySum).doubleValue();
+
+                    //TODO сделать дополнительную таблицу для связи номеров с услугими за которые не нужно удерживать
+                    // возможно связь нужно делать с группами.
+                    // добавить запрос для вставки этой связи.
+                }
+                BigDecimal otherCallService = allCalcByDate.stream()
+                        .filter(call -> call.getMobileOperator().equals("1"))
                         .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-                        .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
-                        .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getStartPayment()))
-                                || (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getEndPayment())))
+                        .filter(call -> !ruleByNumbers
+                                .stream()
+                                .map(RuleByNumber::getOneTimeCallServiceName)
+                                .toList()
+                                .contains(call.getCallService()))
                         .map(Call::getSum)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
+                bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
 
-                callSum += tempCallSum.doubleValue();
-                //TODO сделать дополнительную таблицу для связи номеров с услугими за которые не нужно удерживать
-                // возможно связь нужно делать с группами.
-                // добавить запрос для вставки этой связи.
+            } else if ((phoneNumber.getGroupNumber().getId() == 2)
+                    || (phoneNumber.getGroupNumber().getId() == 4)) {
+                bigDecimalCallSum = allCalcByDate.stream()
+                        .filter(call -> call.getMobileOperator().equals("1"))
+                        .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
+                        .map(Call::getSum)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
 
 
             //TODO сделать константу размер НДС (0.25) или 25%
-            BigDecimal callSumWithNDS = BigDecimal.valueOf(callSum * 0.25 + callSum);
-
+            BigDecimal callSumWithNDS = bigDecimalCallSum.multiply(BigDecimal.valueOf(0.25)).add(bigDecimalCallSum);
             Result result = Result.builder()
                     .ownerName(String.valueOf(phoneNumber.getNumber()))
                     .phoneNumber(phoneNumberService.findById(phoneNumber.getId()))
-                    .sum(callSumWithNDS.add(callServiceSum))
+                    .sum(callSumWithNDS/*.add(callServiceSum)*/)
                     .build();
             results.add(result);
         }
         resultRepository.saveAll(results);
+    }
+
+    private BigDecimal monthlyCallServiceCalc(List<MonthlyCallService> monthlyCallServiceByDate, PhoneNumber phoneNumber) {
+        return monthlyCallServiceByDate.stream()
+                .filter(monthlyCallService -> monthlyCallService.getPhoneNumber().getNumber() == (phoneNumber.getNumber()))
+                .map(MonthlyCallService::getSumWithNDS)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
