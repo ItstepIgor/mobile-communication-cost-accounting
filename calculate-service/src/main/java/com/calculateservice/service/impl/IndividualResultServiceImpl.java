@@ -11,6 +11,7 @@ import com.calculateservice.service.RuleByNumberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,12 +30,12 @@ public class IndividualResultServiceImpl implements IndividualResultService {
     private static final String CALL_TYPE = "Платно";
 
     @Override
-    public void calcIndividualResult(String number) {
+    public void calcIndividualResult(LocalDate date, String number) {
         individualResultRepository.deleteAll();
         List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(Long.parseLong(number));
         List<IndividualResult> individualResults = new ArrayList<>();
-        List<Call> allCallByNumber = callService.findAllCallByNumber(number);
-        if (ruleByNumbers != null) {
+        List<Call> allCallByNumber = callService.findAllCallByNumber(date, number);
+        if (!ruleByNumbers.isEmpty()) {
             for (RuleByNumber ruleByNumber : ruleByNumbers) {
                 allCallByNumber.stream()
                         .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))

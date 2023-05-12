@@ -31,7 +31,7 @@ public class CallServiceImpl implements CallService {
     }
 
     @Override
-    public List<Call> findAllCallByNumber(String number) {
-        return callRepository.findCallByNumber(number);
+    public List<Call> findAllCallByNumber(LocalDate date, String number) {
+        return callRepository.findCallByNumber(date, number);
     }
 }

@@ -74,7 +74,11 @@ public class FillingAndCheckDataController {
             description = "Вызывается метод и выполняется расчет удержания поодному номеру телефона"
     )
     @GetMapping("/calcindividul")
-    public void calculateIndividualResult(@RequestParam String number) {
-        individualResultService.calcIndividualResult(number);
+    public void calculateIndividualResult(@RequestParam(value = "date")
+                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
+                                                      fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
+                                              @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
+                                              LocalDate date, @RequestParam String number) {
+        individualResultService.calcIndividualResult(date, number);
     }
 }

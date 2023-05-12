@@ -12,6 +12,6 @@ public interface CallService {
 
     List<Call> findAllByDate(LocalDate date);
 
-    List<Call> findAllCallByNumber(String number);
+    List<Call> findAllCallByNumber(LocalDate date, String number);
 
 }
