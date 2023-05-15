@@ -1606,3 +1606,10 @@ VALUES (1, 1),
        (15, 1),
        (16, 1),
        (17, 1);
+
+--changeset igor:7
+
+INSERT INTO type_transfer_work_day (id, type_transfer_work_day_name)
+VALUES (1, 'Выходные в будний день'),
+       (2, 'Работа в субботу или воскресенье')
+

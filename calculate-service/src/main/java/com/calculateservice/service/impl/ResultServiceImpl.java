@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,8 @@ public class ResultServiceImpl implements ResultService {
     private final ResultRepository resultRepository;
 
     private final CallService callService;
+
+    private final TransferWorkDayService transferWorkDayService;
 
     private final MonthlyCallServiceService monthlyCallServiceService;
 
@@ -31,6 +35,8 @@ public class ResultServiceImpl implements ResultService {
         List<Call> allCalcByDate = callService.findAllByDate(date);
         List<MonthlyCallService> monthlyCallServiceByDate = monthlyCallServiceService.findAllByDate(date);
         List<PhoneNumber> phoneNumbers = phoneNumberService.findAll();
+        List<TransferWorkDay> transferWorkDays =
+                transferWorkDayService.findAllTransferWorkDay(date);
 
         for (PhoneNumber phoneNumber : phoneNumbers) {
 
@@ -42,23 +48,25 @@ public class ResultServiceImpl implements ResultService {
             if (phoneNumber.getGroupNumber().getId() == 1) {
                 List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber());
                 for (RuleByNumber ruleByNumber : ruleByNumbers) {
-                    BigDecimal weekDaySum = allCalcByDate.stream()
+                    BigDecimal weekDaySum = getSum(allCalcByDate.stream()
                             .filter(call -> call.getMobileOperator().equals("1"))
                             .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
                             .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
-                            .filter(call -> !(call.getDayOfWeek() == 6 || call.getDayOfWeek() == 7))
+                            .filter(call -> !(call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SATURDAY)
+                                    || call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SUNDAY)
+                                    || findTransferWorkDay(transferWorkDays, call.getCallDateTime().toLocalDate(), 1)))
                             .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getStartPayment()))
                                     || (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getEndPayment())))
-                            .map(Call::getSum)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                            .toList());
 
-                    BigDecimal weekEndSum = allCalcByDate.stream()
+                    BigDecimal weekEndSum = getSum(allCalcByDate.stream()
                             .filter(call -> call.getMobileOperator().equals("1"))
                             .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
                             .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
-                            .filter(call -> (call.getDayOfWeek() == 6 || call.getDayOfWeek() == 7))
-                            .map(Call::getSum)
-                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+                            .filter(call -> (call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SATURDAY)
+                                    || call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SUNDAY)
+                                    || findTransferWorkDay(transferWorkDays, call.getCallDateTime().toLocalDate(), 1)
+                            )).toList());
 
                     callSum += weekEndSum.add(weekDaySum).doubleValue();
 
@@ -66,25 +74,21 @@ public class ResultServiceImpl implements ResultService {
                     // возможно связь нужно делать с группами.
                     // добавить запрос для вставки этой связи.
                 }
-                BigDecimal otherCallService = allCalcByDate.stream()
+                BigDecimal otherCallService = getSum(allCalcByDate.stream()
                         .filter(call -> call.getMobileOperator().equals("1"))
                         .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
                         .filter(call -> !ruleByNumbers
                                 .stream()
                                 .map(RuleByNumber::getOneTimeCallServiceName)
                                 .toList()
-                                .contains(call.getCallService()))
-                        .map(Call::getSum)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                                .contains(call.getCallService())).toList());
                 bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
 
             } else if ((phoneNumber.getGroupNumber().getId() == 2)
                     || (phoneNumber.getGroupNumber().getId() == 4)) {
-                bigDecimalCallSum = allCalcByDate.stream()
+                bigDecimalCallSum = getSum(allCalcByDate.stream()
                         .filter(call -> call.getMobileOperator().equals("1"))
-                        .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-                        .map(Call::getSum)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                        .filter(call -> call.getShortNumber() == phoneNumber.getNumber()).toList());
             }
 
 
@@ -98,6 +102,26 @@ public class ResultServiceImpl implements ResultService {
             results.add(result);
         }
         resultRepository.saveAll(results);
+    }
+
+    private boolean findTransferWorkDay(List<TransferWorkDay> transferWorkDays, LocalDate date, int i) {
+        Optional<LocalDate> first = transferWorkDays.stream()
+                .filter(transferWorkDay -> transferWorkDay.getTypeTransferWorkDay().getId() == i)
+                .filter(transferWorkDay -> transferWorkDay.getTransferDate().equals(date))
+                .map(TransferWorkDay::getTransferDate)
+                .findFirst();
+        if (first.isPresent()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    private BigDecimal getSum(List<Call> callList) {
+        return callList.stream()
+                .map(Call::getSum)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal monthlyCallServiceCalc(List<MonthlyCallService> monthlyCallServiceByDate, PhoneNumber phoneNumber) {
