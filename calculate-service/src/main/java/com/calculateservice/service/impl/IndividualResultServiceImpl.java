@@ -2,12 +2,12 @@ package com.calculateservice.service.impl;
 
 import com.calculateservice.entity.Call;
 import com.calculateservice.entity.IndividualResult;
-import com.calculateservice.entity.RuleByNumber;
+import com.calculateservice.entity.RuleOneTimeService;
 import com.calculateservice.repository.IndividualResultRepository;
 import com.calculateservice.service.CallService;
 import com.calculateservice.service.IndividualResultService;
 import com.calculateservice.service.PhoneNumberService;
-import com.calculateservice.service.RuleByNumberService;
+import com.calculateservice.service.RuleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +23,7 @@ public class IndividualResultServiceImpl implements IndividualResultService {
 
     private final CallService callService;
 
-    private final RuleByNumberService ruleByNumberService;
+    private final RuleService ruleService;
 
     private final PhoneNumberService phoneNumberService;
 
@@ -32,25 +32,25 @@ public class IndividualResultServiceImpl implements IndividualResultService {
     @Override
     public void calcIndividualResult(LocalDate date, String number) {
         individualResultRepository.deleteAll();
-        List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(Long.parseLong(number));
+        List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(Long.parseLong(number));
         List<IndividualResult> individualResults = new ArrayList<>();
         List<Call> allCallByNumber = callService.findAllCallByNumber(date, number);
-        if (!ruleByNumbers.isEmpty()) {
-            for (RuleByNumber ruleByNumber : ruleByNumbers) {
+        if (!ruleOneTimeServices.isEmpty()) {
+            for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
                 allCallByNumber.stream()
-                        .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                        .filter(call -> call.getCallService().equals(ruleOneTimeService.getOneTimeCallServiceName()))
                         .filter(call -> !(call.getDayOfWeek() == 6 || call.getDayOfWeek() == 7))
-                        .filter(call -> (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getStartPayment()))
-                                && (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getEndPayment())))
+                        .filter(call -> (call.getCallDateTime().toLocalTime().isAfter(ruleOneTimeService.getStartPayment()))
+                                && (call.getCallDateTime().toLocalTime().isBefore(ruleOneTimeService.getEndPayment())))
                         .forEach(call -> individualResults.add(individualResultBuilder(call, "Днем")));
                 allCallByNumber.stream()
-                        .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                        .filter(call -> call.getCallService().equals(ruleOneTimeService.getOneTimeCallServiceName()))
                         .filter(call -> !(call.getDayOfWeek() == 6 || call.getDayOfWeek() == 7))
-                        .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getStartPayment()))
-                                || (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getEndPayment())))
+                        .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleOneTimeService.getStartPayment()))
+                                || (call.getCallDateTime().toLocalTime().isAfter(ruleOneTimeService.getEndPayment())))
                         .forEach(call -> individualResults.add(individualResultBuilder(call, CALL_TYPE)));
                 allCallByNumber.stream()
-                        .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                        .filter(call -> call.getCallService().equals(ruleOneTimeService.getOneTimeCallServiceName()))
                         .filter(call -> (call.getDayOfWeek() == 6 || call.getDayOfWeek() == 7))
                         .forEach(call -> individualResults.add(individualResultBuilder(call, CALL_TYPE)));
             }

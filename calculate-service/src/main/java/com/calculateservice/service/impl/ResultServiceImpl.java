@@ -27,7 +27,7 @@ public class ResultServiceImpl implements ResultService {
 
     private final PhoneNumberService phoneNumberService;
 
-    private final RuleByNumberService ruleByNumberService;
+    private final RuleService ruleService;
 
     @Override
     public void calcResult(LocalDate date) {
@@ -46,23 +46,23 @@ public class ResultServiceImpl implements ResultService {
 
             double callSum = 0.0;
             if (phoneNumber.getGroupNumber().getId() == 1) {
-                List<RuleByNumber> ruleByNumbers = ruleByNumberService.findRuleByNumber(phoneNumber.getNumber());
-                for (RuleByNumber ruleByNumber : ruleByNumbers) {
+                List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
+                for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
                     BigDecimal weekDaySum = getSum(allCalcByDate.stream()
                             .filter(call -> call.getMobileOperator().equals("1"))
                             .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-                            .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                            .filter(call -> call.getCallService().equals(ruleOneTimeService.getOneTimeCallServiceName()))
                             .filter(call -> !(call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SATURDAY)
                                     || call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SUNDAY)
                                     || findTransferWorkDay(transferWorkDays, call.getCallDateTime().toLocalDate(), 1)))
-                            .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleByNumber.getStartPayment()))
-                                    || (call.getCallDateTime().toLocalTime().isAfter(ruleByNumber.getEndPayment())))
+                            .filter(call -> (call.getCallDateTime().toLocalTime().isBefore(ruleOneTimeService.getStartPayment()))
+                                    || (call.getCallDateTime().toLocalTime().isAfter(ruleOneTimeService.getEndPayment())))
                             .toList());
 
                     BigDecimal weekEndSum = getSum(allCalcByDate.stream()
                             .filter(call -> call.getMobileOperator().equals("1"))
                             .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-                            .filter(call -> call.getCallService().equals(ruleByNumber.getOneTimeCallServiceName()))
+                            .filter(call -> call.getCallService().equals(ruleOneTimeService.getOneTimeCallServiceName()))
                             .filter(call -> (call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SATURDAY)
                                     || call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SUNDAY)
                                     || findTransferWorkDay(transferWorkDays, call.getCallDateTime().toLocalDate(), 1)
@@ -77,9 +77,9 @@ public class ResultServiceImpl implements ResultService {
                 BigDecimal otherCallService = getSum(allCalcByDate.stream()
                         .filter(call -> call.getMobileOperator().equals("1"))
                         .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-                        .filter(call -> !ruleByNumbers
+                        .filter(call -> !ruleOneTimeServices
                                 .stream()
-                                .map(RuleByNumber::getOneTimeCallServiceName)
+                                .map(RuleOneTimeService::getOneTimeCallServiceName)
                                 .toList()
                                 .contains(call.getCallService())).toList());
                 bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
@@ -97,7 +97,7 @@ public class ResultServiceImpl implements ResultService {
             Result result = Result.builder()
                     .ownerName(String.valueOf(phoneNumber.getNumber()))
                     .phoneNumber(phoneNumberService.findById(phoneNumber.getId()))
-                    .sum(callSumWithNDS/*.add(callServiceSum)*/)
+                    .sum(callSumWithNDS.add(callServiceSum))
                     .build();
             results.add(result);
         }
@@ -125,8 +125,17 @@ public class ResultServiceImpl implements ResultService {
     }
 
     private BigDecimal monthlyCallServiceCalc(List<MonthlyCallService> monthlyCallServiceByDate, PhoneNumber phoneNumber) {
+        List<String> listMonthlyCallServiceName = ruleService
+                .findRuleMonthlyService(phoneNumber.getId())
+                .stream()
+                .map(RuleMonthlyService::getMonthlyCallServiceName)
+                .toList();
+
+
         return monthlyCallServiceByDate.stream()
                 .filter(monthlyCallService -> monthlyCallService.getPhoneNumber().getNumber() == (phoneNumber.getNumber()))
+                .filter(monthlyCallService -> !listMonthlyCallServiceName
+                        .contains(monthlyCallService.getMonthlyCallServiceName()))
                 .map(MonthlyCallService::getSumWithNDS)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }

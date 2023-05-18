@@ -1,6 +1,7 @@
 package com.calculateservice.repository;
 
-import com.calculateservice.entity.RuleByNumber;
+import com.calculateservice.entity.RuleMonthlyService;
+import com.calculateservice.entity.RuleOneTimeService;
 import com.calculateservice.entity.RuleOneTimeCallService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RuleByNumberRepository extends JpaRepository<RuleOneTimeCallService, Long> {
+public interface RuleRepository extends JpaRepository<RuleOneTimeCallService, Long> {
 
     @Query(value = "SELECT ot.one_time_call_service_name AS oneTimeCallServiceName, " +
             "pn.number AS number," +
@@ -22,5 +23,15 @@ public interface RuleByNumberRepository extends JpaRepository<RuleOneTimeCallSer
             "LEFT JOIN phone_number pn ON gn.id = pn.group_number_id " +
             "LEFT JOIN one_time_call_service ot ON r.one_time_call_service_id = ot.id " +
             "WHERE pn.number = :number", nativeQuery = true)
-    List<RuleByNumber> findRuleByNumber(@Param("number") long number);
+    List<RuleOneTimeService> findRuleOneTimeService(@Param("number") long number);
+
+
+    @Query(value = "SELECT mcsl.monthly_call_service_name AS monthlyCallServiceName, " +
+            "mcsl.id AS id, " +
+            "pnmcsl.number_id AS numberId " +
+            "FROM monthly_call_service_list mcsl " +
+            "LEFT JOIN phone_number_monthly_call_service_list pnmcsl ON mcsl.id = pnmcsl.monthly_call_service_list_id " +
+            "LEFT JOIN phone_number pn ON pn.id = pnmcsl.number_id " +
+            "WHERE pnmcsl.number_id = :number", nativeQuery = true)
+    List<RuleMonthlyService> findRuleMonthlyService(long number);
 }

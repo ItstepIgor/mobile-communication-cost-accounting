@@ -4,14 +4,16 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"monthlyCallServices", "results"})
-@EqualsAndHashCode(exclude = {"monthlyCallServices", "results"})
+@ToString(exclude = {"monthlyCallServices", "results", "monthlyCallServiceLists"})
+@EqualsAndHashCode(exclude = {"monthlyCallServices", "results", "monthlyCallServiceLists"})
 @Entity
 @Table(name = "phone_number")
 public class PhoneNumber {
@@ -43,4 +45,23 @@ public class PhoneNumber {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "phoneNumber")
     List<IndividualResult> individualResults;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "phone_number_monthly_call_service_list", joinColumns = {@JoinColumn(name = "number_id")},
+            inverseJoinColumns = {@JoinColumn(name = "monthly_call_service_list_id")},
+            uniqueConstraints = {@UniqueConstraint(columnNames = {"number_id", "monthly_call_service_list_id"})})
+    Set<MonthlyCallServiceList> monthlyCallServiceLists = new HashSet<>();
+
+    //если к номеру из БД добавляем правила то нужно добавлять эти методы
+    //а если будем и к правилам добавлять севвисам то нужно так же писать такие методы в сервисах
+    public void addMonthlyCallServiceList(MonthlyCallServiceList monthlyCallServiceList) {
+        this.monthlyCallServiceLists.add(monthlyCallServiceList);
+        monthlyCallServiceList.getPhoneNumbers().add(this);
+    }
+
+    public void removeRule(MonthlyCallServiceList monthlyCallServiceList) {
+        this.monthlyCallServiceLists.remove(monthlyCallServiceList);
+        monthlyCallServiceList.getPhoneNumbers().remove(this);
+    }
+
 }

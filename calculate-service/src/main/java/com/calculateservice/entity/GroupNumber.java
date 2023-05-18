@@ -34,7 +34,7 @@ public class GroupNumber {
 
 
     //если к номеру из БД добавляем правила то нужно добавлять эти методы
-    //а если будем и к правилам добавлять номера то нужно так же писать такие методы в правилах
+    //а если будем и к правилам добавлять группы то нужно так же писать такие методы в правилах
     public void addRule(RuleOneTimeCallService ruleOneTimeCallService) {
         this.ruleOneTimeCallServices.add(ruleOneTimeCallService);
         ruleOneTimeCallService.getGroupNumbers().add(this);
