@@ -88,7 +88,8 @@ public class ResultServiceImpl implements ResultService {
                         getSum(getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
                                 .toList());
 
-            } else if (phoneNumber.getGroupNumber().getId() == 5) {
+            } else if ((phoneNumber.getGroupNumber().getId() == 5)
+                    || (phoneNumber.getGroupNumber().getId() == 8)) {
                 List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
                 for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
                     BigDecimal weekDaySum =
@@ -157,7 +158,7 @@ public class ResultServiceImpl implements ResultService {
                                                                  List<String> stringListLandlineNumber,
                                                                  PhoneNumber phoneNumber) {
         return allCalcByDate.stream()
-                .filter(call -> call.getMobileOperator().equals("1"))
+//                .filter(call -> call.getMobileOperator().equals("1"))
                 .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
                 .filter(call -> !stringListLandlineNumber.contains(call.getNumber()));
     }

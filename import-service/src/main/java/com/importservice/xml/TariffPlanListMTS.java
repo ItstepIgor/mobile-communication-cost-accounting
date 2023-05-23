@@ -13,6 +13,8 @@ public class TariffPlanListMTS {
     private String n;
     @XmlAttribute(name = "u")
     private String u;
+    @XmlElement(name="c")
+    private List<AllCostByNumber> c = new ArrayList<>();
     @XmlElementWrapper(name="tp")
     @XmlElement(name="i")
     private List<TariffPlanByNumber> i = new ArrayList<>();
