@@ -169,11 +169,7 @@ public class ResultServiceImpl implements ResultService {
                 .filter(transferWorkDay -> transferWorkDay.getTransferDate().equals(date))
                 .map(TransferWorkDay::getTransferDate)
                 .findFirst();
-        if (first.isPresent()) {
-            return true;
-        } else {
-            return false;
-        }
+        return first.isPresent();
     }
 
 
