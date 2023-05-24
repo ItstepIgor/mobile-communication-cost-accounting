@@ -2,6 +2,7 @@ package com.importservice.service.impl;
 
 import com.importservice.service.*;
 import com.importservice.util.Extractor;
+import com.importservice.util.MultiPartArchiveExtractor;
 import com.importservice.util.Unmarshaller;
 import com.importservice.xml.ReportMTS;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,8 @@ public class ImportServiceImpl implements ImportService {
     @SneakyThrows
     public void importMTS(MultipartFile file) {
         ReportMTS reportMTS;
-        try (InputStream inputStreams = Extractor.extractFromArchive(file)) {
+//        try (InputStream inputStreams = Extractor.extractFromArchive(file)) {
+        try (InputStream inputStreams = MultiPartArchiveExtractor.extractFromArchive(file)) {
             reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
         }
         periodService.saveImportPeriodMTS(reportMTS);

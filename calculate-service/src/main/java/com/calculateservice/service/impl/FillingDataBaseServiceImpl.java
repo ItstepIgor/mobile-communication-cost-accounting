@@ -117,13 +117,8 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
 
         List<MonthlyCallService> allMonthlyCallService = findAllMonthlyCallService();
 
-        Set<String> monthlyCallServiceName = allMonthlyCallService.stream()
-                .map(MonthlyCallService::getMonthlyCallServiceName)
-                .collect(Collectors.toSet());
-
         allCallServiceDTOS.stream()
                 .filter(allCallServiceDTO -> !allCallServiceDTO.getOneTimeCallService())
-                .filter(allCallServiceDTO -> !monthlyCallServiceName.contains(allCallServiceDTO.getCallServiceName()))
                 .forEach(allCallServiceDTO -> {
                     MonthlyCallService monthlyCallService = MonthlyCallService.builder()
                             .monthlyCallServiceName(allCallServiceDTO.getCallServiceName())
@@ -167,7 +162,7 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
                 .forEach(allCallServiceDTO -> {
                     PhoneNumber phoneNumber = PhoneNumber.builder()
                             .number(allCallServiceDTO.getNumber())
-                            .groupNumber(groupNumberRepository.findById(7L).orElse(null))
+                            .groupNumber(groupNumberRepository.findById(9L).orElse(null))
                             .mobileOperator(mobileOperatorService
                                     .findById(allCallServiceDTO.getMobileOperator()))
                             .build();
