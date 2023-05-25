@@ -149,10 +149,25 @@ public class ResultServiceImpl implements ResultService {
     }
 
     private boolean getFilterByDay(List<TransferWorkDay> transferWorkDays, Call call) {
-        return call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SATURDAY)
-                || call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SUNDAY)
-                || findTransferWorkDay(transferWorkDays, call.getCallDateTime().toLocalDate(), 1);
+        List<LocalDate> localDateDayOff = transferWorkDays.stream()
+                .filter(transferWorkDay -> transferWorkDay.getTypeTransferWorkDay().getId() == 1)
+                .map(TransferWorkDay::getTransferDate)
+                .toList();
+
+        List<LocalDate> localDateDayWork = transferWorkDays.stream()
+                .filter(transferWorkDay -> transferWorkDay.getTypeTransferWorkDay().getId() == 2)
+                .map(TransferWorkDay::getTransferDate)
+                .toList();
+
+        return localDateDayOff.contains(call.getCallDateTime().toLocalDate())
+                || (!localDateDayWork.contains(call.getCallDateTime().toLocalDate())
+                && (call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SATURDAY)
+                || call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SUNDAY)));
     }
+
+    //  Если дата звонка содержится в списке дат  выходной среди недели
+    //  Если дата звонка не содержится в списке дат работа в выходной и это суббота или воскресенье
+
 
     private static Stream<Call> getFilterNumberAndLandlineNumber(List<Call> allCalcByDate,
                                                                  List<String> stringListLandlineNumber,
