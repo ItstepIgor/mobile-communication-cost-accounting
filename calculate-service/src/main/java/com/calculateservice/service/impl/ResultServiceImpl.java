@@ -4,17 +4,15 @@ import com.calculateservice.dto.AllExpensesByPhoneNumberDTO;
 import com.calculateservice.entity.*;
 import com.calculateservice.repository.ResultRepository;
 import com.calculateservice.service.*;
+import com.calculateservice.util.Filters;
 import com.calculateservice.util.ImportFeignClients;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -44,77 +42,76 @@ public class ResultServiceImpl implements ResultService {
                 .stream().map(LandlineNumber::getNumber).toList();
         List<MonthlyCallService> monthlyCallServiceByDate = monthlyCallServiceService.findAllByDate(date);
         List<PhoneNumber> phoneNumbers = phoneNumberService.findAll();
-        List<TransferWorkDay> transferWorkDays =
-                transferWorkDayService.findAllTransferWorkDay(date);
+        List<TransferWorkDay> transferWorkDays = transferWorkDayService.findAllTransferWorkDay(date);
         List<AllExpensesByPhoneNumberDTO> allExpensesByPhoneNumber =
                 importFeignClients.findAllExpensesByPhoneNumberMTS(date).getBody();
-        Optional<BigDecimal> optionalCallSum = Optional.empty();
+        BigDecimal optionalCallSum = BigDecimal.valueOf(0.0);
         for (PhoneNumber phoneNumber : phoneNumbers) {
 
             BigDecimal bigDecimalCallSum = BigDecimal.valueOf(0.0);
             BigDecimal callServiceSum = BigDecimal.valueOf(0.0);
 
-            if ((phoneNumber.getGroupNumber().getId() != 3) && (phoneNumber.getGroupNumber().getId() != 7)) {
+            long phoneId = phoneNumber.getGroupNumber().getId();
+
+            if ((phoneId != 3) && (phoneId != 7)) {
                 callServiceSum = monthlyCallServiceCalc(monthlyCallServiceByDate, phoneNumber);
             }
 
             double callSum = 0.0;
-            if (phoneNumber.getGroupNumber().getId() == 1) {
-                List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
-                for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
-                    BigDecimal weekDaySum =
-                            getSum(getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
-                                    .filter(call -> getFilterByRule(ruleOneTimeService, call))
-                                    .filter(call -> getFilterByTime(ruleOneTimeService, call))
-                                    .filter(call -> !getFilterByDay(transferWorkDays, call))
-                                    .toList());
+            switch ((int) phoneId) {
 
-                    BigDecimal weekEndSum =
-                            getSum(getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
-                                    .filter(call -> getFilterByRule(ruleOneTimeService, call))
-                                    .filter(call -> getFilterByDay(transferWorkDays, call)).toList());
+                case 1 -> {
+                    List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
+                    for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
+                        BigDecimal weekDaySum =
+                                getSum(Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
+                                        .filter(call -> Filters.getFilterByRule(ruleOneTimeService, call))
+                                        .filter(call -> Filters.getFilterByTime(ruleOneTimeService, call))
+                                        .filter(call -> !Filters.getFilterByDay(transferWorkDays, call))
+                                        .toList());
 
-                    callSum += weekEndSum.add(weekDaySum).doubleValue();
+                        BigDecimal weekEndSum =
+                                getSum(Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
+                                        .filter(call -> Filters.getFilterByRule(ruleOneTimeService, call))
+                                        .filter(call -> Filters.getFilterByDay(transferWorkDays, call)).toList());
+
+                        callSum += weekEndSum.add(weekDaySum).doubleValue();
+
+                    }
+                    BigDecimal otherCallService =
+                            getSum(getOtherCallService(allCalcByDate, stringListLandlineNumber, phoneNumber, ruleOneTimeServices));
+                    bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
 
                 }
-                BigDecimal otherCallService =
-                        getSum(getOtherCallService(allCalcByDate, stringListLandlineNumber, phoneNumber, ruleOneTimeServices));
-                bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
-
-            } else if ((phoneNumber.getGroupNumber().getId() == 2)
-                    || (phoneNumber.getGroupNumber().getId() == 4)
-                    || (phoneNumber.getGroupNumber().getId() == 6)) {
-                bigDecimalCallSum =
-                        getSum(getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
+                case 2, 4, 6 -> bigDecimalCallSum =
+                        getSum(Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
                                 .toList());
-
-            } else if ((phoneNumber.getGroupNumber().getId() == 5)
-                    || (phoneNumber.getGroupNumber().getId() == 8)) {
-                List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
-                for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
-                    BigDecimal weekDaySum =
-                            getSum(getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
-                                    .filter(call -> getFilterByRule(ruleOneTimeService, call))
-                                    .filter(call -> getFilterByTime(ruleOneTimeService, call))
-                                    .toList());
-                    callSum += weekDaySum.doubleValue();
+                case 5, 8 -> {
+                    List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
+                    for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
+                        BigDecimal weekDaySum =
+                                getSum(Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
+                                        .filter(call -> Filters.getFilterByRule(ruleOneTimeService, call))
+                                        .filter(call -> Filters.getFilterByTime(ruleOneTimeService, call))
+                                        .toList());
+                        callSum += weekDaySum.doubleValue();
+                    }
+                    BigDecimal otherCallService =
+                            getSum(getOtherCallService(allCalcByDate, stringListLandlineNumber, phoneNumber, ruleOneTimeServices));
+                    bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
                 }
-                BigDecimal otherCallService =
-                        getSum(getOtherCallService(allCalcByDate, stringListLandlineNumber, phoneNumber, ruleOneTimeServices));
-                bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
-            } else if (phoneNumber.getGroupNumber().getId() == 7) {
-                optionalCallSum = allExpensesByPhoneNumber.stream()
+                case 7 -> optionalCallSum = allExpensesByPhoneNumber.stream()
                         .filter(allExpensesByPhoneNumberDTO -> allExpensesByPhoneNumberDTO.getNumber().substring(3, 12)
                                 .equals(String.valueOf(phoneNumber.getNumber())))
                         .map(AllExpensesByPhoneNumberDTO::getSumWithNDS)
-                        .findFirst();
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
             }
             BigDecimal callSumWithNDS;
             //TODO сделать константу размер НДС (0.25) или 25%, обработать ошибку если нет номера в общих расходах
-            if (phoneNumber.getGroupNumber().getId() != 7) {
+            if (phoneId != 7) {
                 callSumWithNDS = bigDecimalCallSum.multiply(BigDecimal.valueOf(0.25)).add(bigDecimalCallSum);
             } else {
-                callSumWithNDS = optionalCallSum.get();
+                callSumWithNDS = optionalCallSum;
             }
 
             Result result = Result.builder()
@@ -131,60 +128,12 @@ public class ResultServiceImpl implements ResultService {
                                                   List<String> stringListLandlineNumber,
                                                   PhoneNumber phoneNumber,
                                                   List<RuleOneTimeService> ruleOneTimeServices) {
-        return getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
+        return Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
                 .filter(call -> !ruleOneTimeServices
                         .stream()
                         .map(RuleOneTimeService::getOneTimeCallServiceName)
                         .toList()
                         .contains(call.getCallService())).toList();
-    }
-
-    private static boolean getFilterByRule(RuleOneTimeService ruleOneTimeService, Call call) {
-        return call.getCallService().equals(ruleOneTimeService.getOneTimeCallServiceName());
-    }
-
-    private static boolean getFilterByTime(RuleOneTimeService ruleOneTimeService, Call call) {
-        return (call.getCallDateTime().toLocalTime().isBefore(ruleOneTimeService.getStartPayment()))
-                || (call.getCallDateTime().toLocalTime().isAfter(ruleOneTimeService.getEndPayment()));
-    }
-
-    private boolean getFilterByDay(List<TransferWorkDay> transferWorkDays, Call call) {
-        List<LocalDate> localDateDayOff = transferWorkDays.stream()
-                .filter(transferWorkDay -> transferWorkDay.getTypeTransferWorkDay().getId() == 1)
-                .map(TransferWorkDay::getTransferDate)
-                .toList();
-
-        List<LocalDate> localDateDayWork = transferWorkDays.stream()
-                .filter(transferWorkDay -> transferWorkDay.getTypeTransferWorkDay().getId() == 2)
-                .map(TransferWorkDay::getTransferDate)
-                .toList();
-
-        return localDateDayOff.contains(call.getCallDateTime().toLocalDate())
-                || (!localDateDayWork.contains(call.getCallDateTime().toLocalDate())
-                && (call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SATURDAY)
-                || call.getCallDateTime().getDayOfWeek().equals(DayOfWeek.SUNDAY)));
-    }
-
-    //  Если дата звонка содержится в списке дат  выходной среди недели
-    //  Если дата звонка не содержится в списке дат работа в выходной и это суббота или воскресенье
-
-
-    private static Stream<Call> getFilterNumberAndLandlineNumber(List<Call> allCalcByDate,
-                                                                 List<String> stringListLandlineNumber,
-                                                                 PhoneNumber phoneNumber) {
-        return allCalcByDate.stream()
-//                .filter(call -> call.getMobileOperator().equals("1"))
-                .filter(call -> call.getShortNumber() == phoneNumber.getNumber())
-                .filter(call -> !stringListLandlineNumber.contains(call.getNumber()));
-    }
-
-    private boolean findTransferWorkDay(List<TransferWorkDay> transferWorkDays, LocalDate date, int i) {
-        Optional<LocalDate> first = transferWorkDays.stream()
-                .filter(transferWorkDay -> transferWorkDay.getTypeTransferWorkDay().getId() == i)
-                .filter(transferWorkDay -> transferWorkDay.getTransferDate().equals(date))
-                .map(TransferWorkDay::getTransferDate)
-                .findFirst();
-        return first.isPresent();
     }
 
 
