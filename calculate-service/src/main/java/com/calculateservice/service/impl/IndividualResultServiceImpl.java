@@ -111,18 +111,22 @@ public class IndividualResultServiceImpl implements IndividualResultService {
                 .callService(call.getCallService())
                 .phoneNumber(phoneNumber)
                 .callDateTime(call.getCallDateTime())
+                .callToNumber(call.getNumber())
                 .sum(call.getSum())
                 .callType(callType)
                 .build();
     }
 
-    private IndividualResult individualResultMonthlyBuilder(PhoneNumber phoneNumber, MonthlyCallService call, String callType) {
+    private IndividualResult individualResultMonthlyBuilder(PhoneNumber phoneNumber,
+                                                            MonthlyCallService monthlyCallService,
+                                                            String callType) {
         return IndividualResult.builder()
-                .ownerName(String.valueOf(call.getPhoneNumber().getNumber()))
-                .callService(call.getMonthlyCallServiceName())
+                .ownerName(String.valueOf(phoneNumber.getNumber()))
+                .callService(monthlyCallService.getMonthlyCallServiceName())
                 .phoneNumber(phoneNumber)
-                .callDateTime(call.getInvoiceDate().atStartOfDay())
-                .sum(call.getSum())
+                .callDateTime(monthlyCallService.getInvoiceDate().atStartOfDay())
+                .callToNumber(String.valueOf(phoneNumber.getNumber()))
+                .sum(monthlyCallService.getSum())
                 .callType(callType)
                 .build();
     }

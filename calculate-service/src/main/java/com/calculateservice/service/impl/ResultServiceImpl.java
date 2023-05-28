@@ -117,6 +117,7 @@ public class ResultServiceImpl implements ResultService {
             Result result = Result.builder()
                     .ownerName(String.valueOf(phoneNumber.getNumber()))
                     .phoneNumber(phoneNumberService.findById(phoneNumber.getId()))
+                    .invoiceDate(date)
                     .sum(callSumWithNDS.add(callServiceSum))
                     .build();
             results.add(result);

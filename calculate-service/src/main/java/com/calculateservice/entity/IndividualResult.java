@@ -31,6 +31,9 @@ public class IndividualResult {
     private LocalDateTime callDateTime;
 
     @Column(nullable = false)
+    private String callToNumber;
+
+    @Column(nullable = false)
     private String callService;
 
     @Column(nullable = false)

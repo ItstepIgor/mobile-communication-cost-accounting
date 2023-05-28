@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,6 +25,9 @@ public class Result {
 
     @Column(nullable = false)
     private String ownerName;
+
+    @Column(nullable = false)
+    private LocalDate invoiceDate;
 
     @Column(nullable = false)
     private LocalDateTime creationDate;
