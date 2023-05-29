@@ -37,31 +37,31 @@ public class ResultServiceImpl implements ResultService {
     @Override
     public void calcResult(LocalDate date) {
         List<Result> results = new ArrayList<>();
-        List<Call> allCalcByDate = callService.findAllByDate(date);
+        List<PhoneNumber> phoneNumbers = phoneNumberService.findAll();
         List<String> stringListLandlineNumber = landlineNumberService.findAllLandlineNumber()
                 .stream().map(LandlineNumber::getNumber).toList();
+        List<Call> allCalcByDate = callService.findAllByDate(date);
         List<MonthlyCallService> monthlyCallServiceByDate = monthlyCallServiceService.findAllByDate(date);
-        List<PhoneNumber> phoneNumbers = phoneNumberService.findAll();
         List<TransferWorkDay> transferWorkDays = transferWorkDayService.findAllTransferWorkDay(date);
         List<AllExpensesByPhoneNumberDTO> allExpensesByPhoneNumber =
                 importFeignClients.findAllExpensesByPhoneNumberMTS(date).getBody();
-        BigDecimal optionalCallSum = BigDecimal.valueOf(0.0);
+
         for (PhoneNumber phoneNumber : phoneNumbers) {
 
+            BigDecimal allExpensesSum = BigDecimal.valueOf(0.0);
             BigDecimal bigDecimalCallSum = BigDecimal.valueOf(0.0);
             BigDecimal callServiceSum = BigDecimal.valueOf(0.0);
 
-            long phoneId = phoneNumber.getGroupNumber().getId();
+            long phoneGroupId = phoneNumber.getGroupNumber().getId();
+            List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
 
-            if ((phoneId != 3) && (phoneId != 7)) {
+            if ((phoneGroupId != 3) && (phoneGroupId != 7)) {
                 callServiceSum = monthlyCallServiceCalc(monthlyCallServiceByDate, phoneNumber);
             }
 
             double callSum = 0.0;
-            switch ((int) phoneId) {
-
+            switch ((int) phoneGroupId) {
                 case 1 -> {
-                    List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
                     for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
                         BigDecimal weekDaySum =
                                 getSum(Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
@@ -87,7 +87,6 @@ public class ResultServiceImpl implements ResultService {
                         getSum(Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
                                 .toList());
                 case 5, 8 -> {
-                    List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(phoneNumber.getNumber());
                     for (RuleOneTimeService ruleOneTimeService : ruleOneTimeServices) {
                         BigDecimal weekDaySum =
                                 getSum(Filters.getFilterNumberAndLandlineNumber(allCalcByDate, stringListLandlineNumber, phoneNumber)
@@ -100,18 +99,19 @@ public class ResultServiceImpl implements ResultService {
                             getSum(getOtherCallService(allCalcByDate, stringListLandlineNumber, phoneNumber, ruleOneTimeServices));
                     bigDecimalCallSum = BigDecimal.valueOf(callSum).add(otherCallService);
                 }
-                case 7 -> optionalCallSum = allExpensesByPhoneNumber.stream()
+                case 7 -> allExpensesSum = allExpensesByPhoneNumber.stream()
                         .filter(allExpensesByPhoneNumberDTO -> allExpensesByPhoneNumberDTO.getNumber().substring(3, 12)
                                 .equals(String.valueOf(phoneNumber.getNumber())))
                         .map(AllExpensesByPhoneNumberDTO::getSumWithNDS)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
+                default -> throw new IllegalStateException("Unexpected value: " + (int) phoneGroupId);
             }
             BigDecimal callSumWithNDS;
             //TODO сделать константу размер НДС (0.25) или 25%, обработать ошибку если нет номера в общих расходах
-            if (phoneId != 7) {
+            if (phoneGroupId != 7) {
                 callSumWithNDS = bigDecimalCallSum.multiply(BigDecimal.valueOf(0.25)).add(bigDecimalCallSum);
             } else {
-                callSumWithNDS = optionalCallSum;
+                callSumWithNDS = allExpensesSum;
             }
 
             Result result = Result.builder()
@@ -145,6 +145,7 @@ public class ResultServiceImpl implements ResultService {
     }
 
     private BigDecimal monthlyCallServiceCalc(List<MonthlyCallService> monthlyCallServiceByDate, PhoneNumber phoneNumber) {
+
         List<String> listMonthlyCallServiceName = ruleService
                 .findRuleMonthlyService(phoneNumber.getId())
                 .stream()

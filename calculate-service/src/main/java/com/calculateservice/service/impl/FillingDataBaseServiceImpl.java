@@ -47,7 +47,6 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
 
         createMonthlyCallServiceList(allCallServiceDTOS);
 
-        List<AllExpensesByPhoneNumberDTO> allExpensesByPhoneNumber = findAllExpensesByPhoneNumber(date);
     }
 
     private void createMonthlyCallServiceList(List<AllCallServiceDTO> allCallServiceDTOS) {
@@ -114,8 +113,6 @@ public class FillingDataBaseServiceImpl implements FillingDataBaseService {
         List<MonthlyCallService> monthlyCallServices = new ArrayList<>();
 
         List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAll();
-
-        List<MonthlyCallService> allMonthlyCallService = findAllMonthlyCallService();
 
         allCallServiceDTOS.stream()
                 .filter(allCallServiceDTO -> !allCallServiceDTO.getOneTimeCallService())

@@ -20,8 +20,8 @@ public class MultiPartArchiveExtractor {
     @SneakyThrows
     public static InputStream extractFromArchive(MultipartFile file) {
 
-//        Files.createDirectories(Path.of("./archive"));
-//        Path filepath = Paths.get("./archive", file.getOriginalFilename());
+        Files.createDirectories(Path.of("./archive"));
+        Path filepath = Paths.get("./archive", file.getOriginalFilename());
 //
 //        try (OutputStream os = Files.newOutputStream(filepath)) {
 //            os.write(file.getBytes());
@@ -32,7 +32,8 @@ public class MultiPartArchiveExtractor {
         try {
 
             archiveOpenVolumeCallback = new MultiPartArchiveExtractor.ArchiveOpenVolumeCallback();
-            IInStream inStream = archiveOpenVolumeCallback.getStream("E:/1/MTS_207306892385_202304_9102704622.part01.rar");
+//            IInStream inStream = archiveOpenVolumeCallback.getStream(filepath.toString());
+            IInStream inStream = archiveOpenVolumeCallback.getStream("K:/Java/IdeaProjects/mobile-communication-cost-accounting/archive/MTS_207306892385_202304_9102704622.part01.rar");
             inArchive = SevenZip.openInArchive(null, inStream, archiveOpenVolumeCallback);
 
             ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
