@@ -1,11 +1,11 @@
-openapi: 3.0.1
-info:
-  version: 1.0.0
-  description: A sample API to illustrate OpenAPI concepts
-  title: Sample API
-paths: {}
-servers:
-  - url: http://localhost:8082/v3/api-docs
-    description: Production server
-  - url: http://192.168.0.104:8082/v3/api-docs
-    description: Beta server
+#openapi: 3.0.1
+#info:
+#  version: 1.0.0
+#  description: A sample API to illustrate OpenAPI concepts
+#  title: Sample API
+#paths: {}
+#servers:
+#  - url: http://localhost:8082/v3/api-docs
+#    description: Production server
+#  - url: http://192.168.0.104:8082/v3/api-docs
+#    description: Beta server

@@ -2,9 +2,7 @@ package com.importservice.controller;
 
 import com.importservice.dto.AllCallServiceDTO;
 import com.importservice.dto.AllExpensesByPhoneNumberDTO;
-import com.importservice.entity.ResponseMessage;
 import com.importservice.service.AllCallServiceService;
-import com.importservice.service.FilesStorageService;
 import com.importservice.service.FindAllInformationOnMTS;
 import com.importservice.service.ImportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,15 +10,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -34,7 +28,6 @@ public class CallController {
     private final ImportService importService;
     private final AllCallServiceService allCallServiceService;
     private final FindAllInformationOnMTS findAllInformationOnMTS;
-    private final FilesStorageService storageService;
 
     @GetMapping("/check")
     public String check() {
@@ -43,7 +36,7 @@ public class CallController {
 
 
     @Operation(
-            summary = "Импорт данных",
+            summary = "Импорт данных по A1",
             description = "Вызывается метод заполнения данных по номерам телефонов и услугам"
     )
     @PostMapping(value = "/importa1", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -51,9 +44,41 @@ public class CallController {
         importService.importA1(file);
     }
 
+    @Operation(
+            summary = "Импорт данных по МТС",
+            description = "Используем этот метод если у нас один файл RAR архива"
+    )
     @PostMapping(value = "/importmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void importMTS(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
         importService.importMTS(file);
+    }
+
+    @Operation(
+            summary = "Метод для получения данных из нескольких файлов RAR",
+            description = "Через swagger отправка не работает, используем postman "
+    )
+    @PostMapping(value = "/multiimportmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void multiImportMTS(@RequestParam(value = "files") MultipartFile[] files) {
+        importService.multiImportMTS(files);
+    }
+
+    @Operation(
+            summary = "Метод только для загрузки RAR файлов",
+            description = "Используем этот метод если у нас несколько файлов загружаем их по очереди"
+    )
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void upload(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
+        importService.saveToFile(file);
+    }
+
+
+    @Operation(
+            summary = "Метод для извлечения данных",
+            description = "Используем этот метод толоко после загрузки нескольких файлов по очереди методом /upload"
+    )
+    @PostMapping(value = "/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void extract(@RequestParam("file") @Parameter(description = "Выбираем файл *.part01.rar") MultipartFile file) {
+        importService.extract(file.getOriginalFilename());
     }
 
     @Operation(
@@ -83,22 +108,4 @@ public class CallController {
         return findAllInformationOnMTS.findAllByDate(date);
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseMessage> uploadFiles(@RequestParam("files") MultipartFile[] files) {
-        String message = "";
-        try {
-            List<String> fileNames = new ArrayList<>();
-
-            Arrays.asList(files).stream().forEach(file -> {
-                storageService.save(file);
-                fileNames.add(file.getOriginalFilename());
-            });
-
-            message = "Uploaded the files successfully: " + fileNames;
-            return ResponseEntity.status(HttpStatus.OK).body(new ResponseMessage(message));
-        } catch (Exception e) {
-            message = "Fail to upload files!";
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseMessage(message));
-        }
-    }
 }

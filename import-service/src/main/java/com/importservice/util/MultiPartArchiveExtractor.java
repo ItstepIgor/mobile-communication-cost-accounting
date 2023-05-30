@@ -5,10 +5,8 @@ import net.sf.sevenzipjbinding.*;
 import net.sf.sevenzipjbinding.impl.RandomAccessFileInStream;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchive;
 import net.sf.sevenzipjbinding.simple.ISimpleInArchiveItem;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -18,22 +16,15 @@ public class MultiPartArchiveExtractor {
     private static final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
     @SneakyThrows
-    public static InputStream extractFromArchive(MultipartFile file) {
+    public static InputStream extractFromArchive(String fileNames) {
 
-        Files.createDirectories(Path.of("./archive"));
-        Path filepath = Paths.get("./archive", file.getOriginalFilename());
-//
-//        try (OutputStream os = Files.newOutputStream(filepath)) {
-//            os.write(file.getBytes());
-//        }
+        Path filepath = Paths.get("./archive", fileNames);
 
         MultiPartArchiveExtractor.ArchiveOpenVolumeCallback archiveOpenVolumeCallback = null;
         IInArchive inArchive = null;
         try {
-
             archiveOpenVolumeCallback = new MultiPartArchiveExtractor.ArchiveOpenVolumeCallback();
-//            IInStream inStream = archiveOpenVolumeCallback.getStream(filepath.toString());
-            IInStream inStream = archiveOpenVolumeCallback.getStream("K:/Java/IdeaProjects/mobile-communication-cost-accounting/archive/MTS_207306892385_202304_9102704622.part01.rar");
+            IInStream inStream = archiveOpenVolumeCallback.getStream(filepath.toString());
             inArchive = SevenZip.openInArchive(null, inStream, archiveOpenVolumeCallback);
 
             ISimpleInArchive simpleInArchive = inArchive.getSimpleInterface();
@@ -76,7 +67,6 @@ public class MultiPartArchiveExtractor {
         }
 
         try (ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray())) {
-//            Files.delete(filepath);
             outputStream.close();
             return inputStream;
         }
@@ -85,7 +75,7 @@ public class MultiPartArchiveExtractor {
     private static class ArchiveOpenVolumeCallback implements IArchiveOpenVolumeCallback, IArchiveOpenCallback {
 
         private Map<String, RandomAccessFile> openedRandomAccessFileList =
-                new HashMap<String, RandomAccessFile>();
+                new HashMap<>();
 
         private String name;
 

@@ -4,7 +4,7 @@ ext {
             'liquibase'         : '4.19.0',
             'lombok'            : '1.18.26',
             'lmBinding'         : '0.2.0',
-            'openapi'           : '2.0.2',
+            'openapi'           : '2.1.0',
             'poi'               : '5.2.3',
             'springCloudVersion': '2022.0.1'
     ]

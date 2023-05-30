@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,8 @@ public class ImportServiceImpl implements ImportService {
     private final PeriodService periodService;
 
     private final AllCallServiceService allCallServiceService;
+
+    private final FilesStorageService storageService;
 
     @Override
     @SneakyThrows
@@ -55,10 +58,51 @@ public class ImportServiceImpl implements ImportService {
     @SneakyThrows
     public void importMTS(MultipartFile file) {
         ReportMTS reportMTS;
-//        try (InputStream inputStreams = Extractor.extractFromArchive(file)) {
-        try (InputStream inputStreams = MultiPartArchiveExtractor.extractFromArchive(file)) {
+        try (InputStream inputStreams = Extractor.extractFromArchive(file)) {
             reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
         }
+        saveToDataBase(reportMTS);
+    }
+
+    @Override
+    @SneakyThrows
+    public void multiImportMTS(MultipartFile[] files) {
+        storageService.deleteAll();
+        storageService.init();
+
+        List<String> fileNames = new ArrayList<>();
+
+        Arrays.asList(files).stream().forEach(file -> {
+            storageService.save(file);
+            fileNames.add(file.getOriginalFilename());
+        });
+        Collections.sort(fileNames);
+
+        ReportMTS reportMTS;
+        try (InputStream inputStreams = MultiPartArchiveExtractor.extractFromArchive(fileNames.get(0))) {
+            reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
+        }
+        saveToDataBase(reportMTS);
+    }
+
+    @Override
+    @SneakyThrows
+    public void extract(String originalFilename) {
+        ReportMTS reportMTS;
+        try (InputStream inputStreams = MultiPartArchiveExtractor.extractFromArchive(originalFilename)) {
+            reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
+        }
+        storageService.deleteAll();
+        saveToDataBase(reportMTS);
+    }
+
+    @Override
+    public void saveToFile(MultipartFile file) {
+        storageService.init();
+        storageService.save(file);
+    }
+
+    private void saveToDataBase(ReportMTS reportMTS) {
         periodService.saveImportPeriodMTS(reportMTS);
         callServiceMTS.saveToDataBaseFromFileMTS(reportMTS);
     }
