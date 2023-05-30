@@ -1,18 +1,12 @@
 package com.importservice.service;
 
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.core.io.Resource;
-import java.nio.file.Path;
-import java.util.stream.Stream;
 
 public interface FilesStorageService {
-    public void init();
+    void init();
 
-    public void save(MultipartFile file);
+    void save(MultipartFile file);
 
-    public Resource load(String filename);
+    void deleteAll();
 
-    public void deleteAll();
-
-    public Stream<Path> loadAll();
 }
