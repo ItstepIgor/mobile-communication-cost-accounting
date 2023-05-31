@@ -18,6 +18,6 @@ public interface ResultRepository extends JpaRepository<Result, Long> {
             "r.sum                      AS sum " +
             "FROM result r " +
             "LEFT JOIN phone_number pn ON r.number_id = pn.id " +
-            "WHERE pn.mobile_operator_id = :mobileOperatorId ", nativeQuery = true)
+            "WHERE pn.mobile_operator_id = :mobileOperatorId and r.sum > 0 ", nativeQuery = true)
     List<ResultPojo> getResult(@Param("mobileOperatorId") long mobileOperatorId);
 }

@@ -8,10 +8,21 @@ import com.calculateservice.service.PhoneNumberService;
 import com.calculateservice.service.ReportService;
 import com.calculateservice.service.ResultService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +35,15 @@ public class ReportServiceImpl implements ReportService {
     private final PhoneNumberService phoneNumberService;
 
     @Override
-    public JasperPrint createReportResult(long mobileOperatorId) {
-        List<ResultPojo> result = resultService.getResult(mobileOperatorId);
-        for (ResultPojo pojo : result) {
-            System.out.println(pojo.getOwner() + ' ' + pojo.getNumber() + ' ' + pojo.getSum());
-        }
-//        JRBeanCollectionDataSource dataSource = null;
-//        JasperReport jasperReport = null;
-//
-//        if (addPayTypeId == 1) {
-//            System.out.println(addPayTypeId);
-//            List<BonusPojo> bonusPojo = staffListRepository.findByAllBonus(addPayTypeId);
-//            InputStream reportBonus = ReportService.class.getClassLoader().getResourceAsStream("ReportBonus.jrxml");
-//            jasperReport = JasperCompileManager.compileReport(reportBonus);
-//            dataSource = new JRBeanCollectionDataSource(bonusPojo);
+    @SneakyThrows
+    public JasperPrint createReportResult(long mobileOperatorId, LocalDate localDate) {
+        List<ResultPojo> resultPojo = resultService.getResult(mobileOperatorId);
+        JRBeanCollectionDataSource dataSource;
+        JasperReport jasperReport;
+
+        InputStream reportResult = ReportService.class.getClassLoader().getResourceAsStream("result.jrxml");
+        jasperReport = JasperCompileManager.compileReport(reportResult);
+        dataSource = new JRBeanCollectionDataSource(resultPojo);
 //
 //        } else if (addPayTypeId == 2) {
 //            System.out.println(addPayTypeId);
@@ -54,14 +60,13 @@ public class ReportServiceImpl implements ReportService {
 //            jasperReport = JasperCompileManager.compileReport(reportComplication);
 //            dataSource = new JRBeanCollectionDataSource(complicationAndMotivationPojo);
 //        }
-//        Map<String, Object> parameters = new HashMap<>();
-//        LocalDate localDate = calcSettingsService.getMaxDateCalcSettings().getCalcDate();
-//        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Map<String, Object> parameters = new HashMap<>();
+
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 //        parameters.put("NumberDateOrder", addPayFundService.getAddPayFundNumberOrder(addPayTypeId));
 //        parameters.put("NumberOrderTradeUnion", addPayFundService.getAddPayFundNumberOrderTradeUnion(addPayTypeId));
-//        parameters.put("CalcDate", date);
-//        return JasperFillManager.fillReport(jasperReport, parameters, dataSource);
-        return null;
+        parameters.put("CalcDate", date);
+        return JasperFillManager.fillReport(jasperReport, parameters, dataSource);
     }
 
     @Override

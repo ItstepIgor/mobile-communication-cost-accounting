@@ -2,9 +2,11 @@ package com.calculateservice.service;
 
 import net.sf.jasperreports.engine.JasperPrint;
 
+import java.time.LocalDate;
+
 public interface ReportService {
 
-    JasperPrint createReportResult(long mobileOperatorId);
+    JasperPrint createReportResult(long mobileOperatorId, LocalDate localDate);
 
     JasperPrint createReportIndividualResult();
 

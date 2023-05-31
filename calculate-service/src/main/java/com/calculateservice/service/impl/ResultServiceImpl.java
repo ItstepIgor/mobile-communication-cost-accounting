@@ -104,7 +104,6 @@ public class ResultServiceImpl implements ResultService {
                                 .equals(String.valueOf(phoneNumber.getNumber())))
                         .map(AllExpensesByPhoneNumberDTO::getSumWithNDS)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-                default -> throw new IllegalStateException("Unexpected value: " + (int) phoneGroupId);
             }
             BigDecimal callSumWithNDS;
             //TODO сделать константу размер НДС (0.25) или 25%, обработать ошибку если нет номера в общих расходах
