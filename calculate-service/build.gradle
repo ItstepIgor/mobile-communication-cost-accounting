@@ -22,6 +22,9 @@ bootJar {
 
 repositories {
 	mavenCentral()
+	maven{
+		url	"https://jaspersoft.jfrog.io/jaspersoft/jaspersoft-repo"
+	}
 }
 
 dependencies {
@@ -31,6 +34,8 @@ dependencies {
 	implementation 'org.springframework.kafka:spring-kafka'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+	implementation "net.sf.jasperreports:jasperreports:${versions.jasperreports}"
+	implementation "net.sf.jasperreports:jasperreports-fonts:${versions.jasperreports}"
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	implementation "org.liquibase:liquibase-core:${versions.liquibase}"
 	implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${versions.openapi}"

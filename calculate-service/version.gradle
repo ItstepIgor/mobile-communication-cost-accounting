@@ -5,6 +5,7 @@ ext {
             'lombok'            : '1.18.26',
             'lmBinding'         : '0.2.0',
             'openapi'           : '2.1.0',
+            'jasperreports'     : '6.20.5',
             'springCloudVersion': '2022.0.1'
     ]
 }

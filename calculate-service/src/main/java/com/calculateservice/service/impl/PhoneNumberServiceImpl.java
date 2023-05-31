@@ -2,6 +2,7 @@ package com.calculateservice.service.impl;
 
 import com.calculateservice.dto.PhoneNumberDTO;
 import com.calculateservice.entity.PhoneNumber;
+import com.calculateservice.entity.PhoneNumberPojo;
 import com.calculateservice.repository.PhoneNumberRepository;
 import com.calculateservice.service.PhoneNumberService;
 import com.calculateservice.service.mapper.PhoneNumberMapper;
@@ -37,5 +38,10 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
     @Override
     public PhoneNumber findPhoneNumberByNumber(Long number) {
         return phoneNumberRepository.findPhoneNumberByNumber(number);
+    }
+
+    @Override
+    public List<PhoneNumberPojo> getListPhoneNumber(long mobileOperatorId) {
+        return phoneNumberRepository.getListPhoneNumber(mobileOperatorId);
     }
 }

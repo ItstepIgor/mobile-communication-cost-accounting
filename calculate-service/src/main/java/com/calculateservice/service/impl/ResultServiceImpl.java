@@ -125,6 +125,11 @@ public class ResultServiceImpl implements ResultService {
         resultRepository.saveAll(results);
     }
 
+    @Override
+    public List<ResultPojo> getResult(long mobileOperatorId) {
+        return resultRepository.getResult(mobileOperatorId);
+    }
+
     private static List<Call> getOtherCallService(List<Call> allCalcByDate,
                                                   List<String> stringListLandlineNumber,
                                                   PhoneNumber phoneNumber,

@@ -138,6 +138,11 @@ public class IndividualResultServiceImpl implements IndividualResultService {
         individualResultRepository.saveAll(individualResults);
     }
 
+    @Override
+    public List<IndividualResultPojo> getIndividualResult() {
+        return individualResultRepository.getIndividualResult();
+    }
+
     private IndividualResult individualResultBuilder(PhoneNumber phoneNumber, Call call, String callType) {
         return IndividualResult.builder()
                 .ownerName(call.getOwnerNumber())
