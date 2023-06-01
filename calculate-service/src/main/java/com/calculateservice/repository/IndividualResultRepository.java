@@ -15,7 +15,9 @@ public interface IndividualResultRepository extends JpaRepository<IndividualResu
     @Query(value = "SELECT r.owner_name     AS owner, " +
             "pn.number                      AS number, " +
             "r.call_date_time               AS callDateTime, " +
+            "r.call_service                 AS callService, " +
             "r.call_to_number               AS callToNumber, " +
+            "r.call_type                    AS callType, " +
             "r.sum                          AS sum " +
             "FROM individual_result r " +
             "LEFT JOIN phone_number pn ON r.number_id = pn.id ", nativeQuery = true)

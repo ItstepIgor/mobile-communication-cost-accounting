@@ -8,9 +8,13 @@ public interface IndividualResultPojo {
 
     String getNumber();
 
+    String getCallService();
+
     LocalDateTime getCallDateTime();
 
     String getCallToNumber();
+
+    String getCallType();
 
     BigDecimal getSum();
 }

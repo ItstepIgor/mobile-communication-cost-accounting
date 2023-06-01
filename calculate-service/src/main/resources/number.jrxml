@@ -5,58 +5,41 @@
 	<parameter name="CalcDate" class="java.util.Date">
 		<defaultValueExpression><![CDATA[new Date()]]></defaultValueExpression>
 	</parameter>
-	<parameter name="NumberDateOrder" class="java.lang.String"/>
+	<parameter name="MobileOperator" class="java.lang.String"/>
 	<parameter name="NumberOrderTradeUnion" class="java.lang.String"/>
 	<parameter name="logo" class="java.lang.String"/>
 	<parameter name="logo1" class="java.io.InputStream"/>
 	<field name="owner" class="java.lang.String"/>
 	<field name="number" class="java.lang.String"/>
-	<field name="sum" class="java.math.BigDecimal"/>
+	<field name="position" class="java.lang.String"/>
 	<variable name="summa" class="java.math.BigDecimal" resetType="Page" calculation="Sum">
-		<variableExpression><![CDATA[$F{sum}]]></variableExpression>
+		<variableExpression><![CDATA[$F{position}]]></variableExpression>
 	</variable>
 	<variable name="Year" class="java.lang.String"/>
 	<background>
 		<band/>
 	</background>
 	<pageHeader>
-		<band height="80">
+		<band height="50">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<staticText>
-				<reportElement x="60" y="0" width="440" height="60" uuid="2ae7724a-d119-4a7b-9eca-f877b381894b"/>
+			<image>
+				<reportElement x="10" y="0" width="50" height="50" uuid="8512e2d4-b2f0-4927-a91e-c15582cbc021"/>
+				<imageExpression><![CDATA[$P{logo1}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="170" y="5" width="260" height="37" uuid="c9699788-e9cd-4300-8d94-721a446da8aa"/>
 				<textElement textAlignment="Center">
 					<font fontName="DejaVu Serif"/>
 				</textElement>
-				<text><![CDATA[ОАО "Витебская бройлерная птицефабрика"
-Распоряжение	
-на удержание из заработной платы за разговоры
-со служебных мобильных телефонов во внерабочее время
-
-
-
-]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="420" y="60" width="100" height="13" uuid="c6975798-4908-4f3c-86f0-a031481920fd"/>
-				<textElement textAlignment="Justified">
-					<font fontName="DejaVu Serif"/>
-				</textElement>
-				<textFieldExpression><![CDATA["за " + new SimpleDateFormat("MMMMM").format($P{CalcDate}) + " "+new SimpleDateFormat("yyyy").format($P{CalcDate})+" года"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["ОАО " + " Витебская бройлерная птицефабрика " +
+" Номера телефонов абонентов  " + java.lang.String.format($P{MobileOperator})]]></textFieldExpression>
 			</textField>
-			<textField pattern="dd.MM.yyyy">
-				<reportElement x="70" y="60" width="100" height="14" uuid="e054da21-6611-49b7-9987-d27c9a0773a9"/>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
-			</textField>
-			<image>
-				<reportElement x="0" y="0" width="50" height="50" uuid="8512e2d4-b2f0-4927-a91e-c15582cbc021"/>
-				<imageExpression><![CDATA[$P{logo1}]]></imageExpression>
-			</image>
 		</band>
 	</pageHeader>
 	<columnHeader>
 		<band height="18">
 			<staticText>
-				<reportElement mode="Opaque" x="34" y="0" width="242" height="18" forecolor="#006699" backcolor="#E6E6E6" uuid="55735968-342c-4d29-8dc1-db2263a44d11">
+				<reportElement mode="Opaque" x="34" y="0" width="216" height="18" forecolor="#006699" backcolor="#E6E6E6" uuid="55735968-342c-4d29-8dc1-db2263a44d11">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="40a9814d-ecb4-424f-aea8-cad246f112b5"/>
 				</reportElement>
 				<box>
@@ -72,7 +55,7 @@
 				<text><![CDATA[ФИО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="276" y="0" width="132" height="18" forecolor="#006699" backcolor="#E6E6E6" uuid="e9b64414-ad92-4257-a8f2-63a23c460255">
+				<reportElement mode="Opaque" x="460" y="0" width="90" height="18" forecolor="#006699" backcolor="#E6E6E6" uuid="e9b64414-ad92-4257-a8f2-63a23c460255">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="372fc4a5-58e8-4f68-9b0b-b8c92b4521d4"/>
 				</reportElement>
 				<box>
@@ -88,7 +71,7 @@
 				<text><![CDATA[Номер телефона]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="408" y="0" width="142" height="18" forecolor="#006699" backcolor="#E6E6E6" uuid="9d39b1e9-ac02-4d51-8db0-4309b5c26bcf">
+				<reportElement mode="Opaque" x="250" y="0" width="210" height="18" forecolor="#006699" backcolor="#E6E6E6" uuid="9d39b1e9-ac02-4d51-8db0-4309b5c26bcf">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aafde1ac-9f21-4267-b383-ffd18072315c"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 				</reportElement>
@@ -102,7 +85,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Serif" size="8" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Сумма]]></text>
+				<text><![CDATA[Должность]]></text>
 			</staticText>
 			<staticText>
 				<reportElement mode="Opaque" x="0" y="0" width="34" height="18" forecolor="#006699" backcolor="#E6E6E6" uuid="45dcd3fc-da0a-4e52-9edc-33f67ad0ffae">
@@ -125,7 +108,7 @@
 	<detail>
 		<band height="15">
 			<textField>
-				<reportElement x="34" y="0" width="242" height="15" uuid="1324277f-1cf1-4cc2-a5f3-88ededc0ff6e">
+				<reportElement x="34" y="0" width="216" height="15" uuid="1324277f-1cf1-4cc2-a5f3-88ededc0ff6e">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="40a9814d-ecb4-424f-aea8-cad246f112b5"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -141,7 +124,7 @@
 				<textFieldExpression><![CDATA[" "+$F{owner}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="276" y="0" width="132" height="15" uuid="b9c4d404-6ffe-47b5-aeaf-ee9ffb804c6a">
+				<reportElement x="460" y="0" width="90" height="15" uuid="b9c4d404-6ffe-47b5-aeaf-ee9ffb804c6a">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="372fc4a5-58e8-4f68-9b0b-b8c92b4521d4"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
 				</reportElement>
@@ -173,7 +156,7 @@
 				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight">
-				<reportElement x="408" y="0" width="142" height="15" uuid="6808c78b-2ae1-4b18-86a3-16e50cae46fd">
+				<reportElement x="250" y="0" width="210" height="15" uuid="6808c78b-2ae1-4b18-86a3-16e50cae46fd">
 					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aafde1ac-9f21-4267-b383-ffd18072315c"/>
 					<property name="com.jaspersoft.studio.unit.width" value="px"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
@@ -187,57 +170,8 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Serif" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{sum}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{position}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
-	<summary>
-		<band height="75">
-			<property name="com.jaspersoft.studio.unit.height" value="px"/>
-			<textField textAdjust="StretchHeight">
-				<reportElement positionType="Float" x="34" y="0" width="374" height="15" uuid="ddb5d2ce-9cbe-487f-b031-6dac17bd6708">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c05cb4c4-7321-464e-b20b-38a19f892a19"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="DejaVu Serif" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA["  Итого"]]></textFieldExpression>
-			</textField>
-			<textField textAdjust="StretchHeight">
-				<reportElement positionType="Float" x="408" y="0" width="142" height="15" uuid="ae23e084-7bf1-4ce6-abb3-6dec99183253">
-					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="aafde1ac-9f21-4267-b383-ffd18072315c"/>
-					<property name="com.jaspersoft.studio.unit.width" value="px"/>
-					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-				</reportElement>
-				<box>
-					<topPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<leftPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<bottomPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-					<rightPen lineWidth="1.0" lineStyle="Solid" lineColor="#000000"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="DejaVu Serif" size="8"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$V{summa}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="40" y="20" width="496" height="50" uuid="48942bf9-0afc-4fb4-8f5b-0f111797d1b1"/>
-				<textElement>
-					<font fontName="DejaVu Serif" size="9"/>
-				</textElement>
-				<text><![CDATA[Зам. генерального директора   по
-финансовым вопросам и экономике                                                       Н.В. Комаров
-
-Исполнитель                                                                                             И.М. Билалов]]></text>
-			</staticText>
-		</band>
-	</summary>
 </jasperReport>
