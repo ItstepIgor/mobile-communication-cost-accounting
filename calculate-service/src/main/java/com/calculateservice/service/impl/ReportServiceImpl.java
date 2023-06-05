@@ -43,7 +43,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @SneakyThrows
     public JasperPrint createReportResult(long mobileOperatorId, LocalDate localDate) {
-        List<ResultPojo> resultPojo = resultService.getResult(mobileOperatorId);
+        List<ResultPojo> resultPojo = resultService.getResult(mobileOperatorId, localDate);
         JRBeanCollectionDataSource dataSource;
         JasperReport jasperReport;
 

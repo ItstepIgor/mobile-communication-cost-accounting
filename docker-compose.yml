@@ -90,41 +90,41 @@ services:
     depends_on:
       - "kafka_my_app"
 
-#  config-service:
-#    build:
-#      context: ./config-service
-#      dockerfile: Dockerfile
-#    image: config-service:latest
-#    container_name: config-service-app
-#    ports:
-#      - "8888:8888"
-#    environment:
-#      CONSUL_HOST: consul
-#      CONSUL_PORT: 8500
-##      BASEDIR: file:///home/igor/config-repo
-#    restart: always
-#    networks:
-#      - mobile-communication-net
-#
-#  gateway-service:
-#    build:
-#      context: ./gateway-service
-#      dockerfile: Dockerfile
-#    image: gateway-service:latest
-#    container_name: gateway-service-app
-#    ports:
-#      - "8765:8765"
-#    environment:
-#      CONFIG_SERVICE_URL: http://config-service:8888
-#      CONSUL_HOST: consul
-#      CONSUL_PORT: 8500
-##      AUTHORIZATION_SERVICE: http://authorization-service:9002
-#    restart: always
-#    networks:
-#      - mobile-communication-net
-#    depends_on:
-#      - config-service
-##      - discovery-service
+  config-service:
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+    image: config-service:latest
+    container_name: config-service-app
+    ports:
+      - "8888:8888"
+    environment:
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+#      BASEDIR: file:///home/igor/config-repo
+    restart: always
+    networks:
+      - mobile-communication-net
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    image: gateway-service:latest
+    container_name: gateway-service-app
+    ports:
+      - "8765:8765"
+    environment:
+      CONFIG_SERVICE_URL: http://config-service:8888
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+#      AUTHORIZATION_SERVICE: http://authorization-service:9002
+    restart: always
+    networks:
+      - mobile-communication-net
+    depends_on:
+      - config-service
+#      - discovery-service
 
 #  calculate-service:
 #    build:

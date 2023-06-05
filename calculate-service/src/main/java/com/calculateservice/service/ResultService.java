@@ -9,5 +9,5 @@ public interface ResultService {
 
     void calcResult(LocalDate date);
 
-    List<ResultPojo> getResult(long mobileOperatorId);
+    List<ResultPojo> getResult(long mobileOperatorId, LocalDate localDate);
 }

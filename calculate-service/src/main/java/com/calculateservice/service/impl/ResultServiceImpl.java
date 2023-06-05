@@ -125,8 +125,8 @@ public class ResultServiceImpl implements ResultService {
     }
 
     @Override
-    public List<ResultPojo> getResult(long mobileOperatorId) {
-        return resultRepository.getResult(mobileOperatorId);
+    public List<ResultPojo> getResult(long mobileOperatorId, LocalDate localDate) {
+        return resultRepository.getResult(mobileOperatorId, localDate);
     }
 
     private static List<Call> getOtherCallService(List<Call> allCalcByDate,

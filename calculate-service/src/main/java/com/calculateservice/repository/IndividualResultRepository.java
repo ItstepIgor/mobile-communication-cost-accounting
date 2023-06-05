@@ -18,7 +18,7 @@ public interface IndividualResultRepository extends JpaRepository<IndividualResu
             "r.call_service                 AS callService, " +
             "r.call_to_number               AS callToNumber, " +
             "r.call_type                    AS callType, " +
-            "r.sum                          AS sum " +
+            "ROUND(r.sum, 2)                AS sum " +
             "FROM individual_result r " +
             "LEFT JOIN phone_number pn ON r.number_id = pn.id ", nativeQuery = true)
     List<IndividualResultPojo> getIndividualResult();
