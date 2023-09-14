@@ -2,6 +2,7 @@ package com.calculateservice.service;
 
 import com.calculateservice.CalculateServiceApplication;
 import com.calculateservice.entity.GroupNumber;
+import com.calculateservice.integration.IntegrationTestBase;
 import com.calculateservice.repository.GroupNumberRepository;
 import com.calculateservice.service.impl.GroupNumberServiceImpl;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
@@ -22,8 +22,7 @@ import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = CalculateServiceApplication.class)
-@ActiveProfiles("test")
-class GroupNumberServiceImplTest {
+class GroupNumberServiceImplTest extends IntegrationTestBase {
 
     @Mock
     private GroupNumberRepository groupNumberRepository;
