@@ -176,7 +176,6 @@ VALUES (1, 'А/пл.:План Комфорт 4'),
        (171, 'Добавление услуги SMS Роуминг'),
        (172, 'Добавление услуги Телематика-5-Сервер');
 
-select setval('monthly_call_service_list_id_seq', (select max(id) from monthly_call_service_list));
 
 --changeset igor:2
 
