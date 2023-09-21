@@ -1,8 +1,10 @@
 package com.calculateservice.service.impl;
 
+import com.calculateservice.dto.GroupNumberDTO;
 import com.calculateservice.entity.GroupNumber;
 import com.calculateservice.repository.GroupNumberRepository;
 import com.calculateservice.service.GroupNumberService;
+import com.calculateservice.service.mapper.GroupNumberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,14 +17,16 @@ public class GroupNumberServiceImpl implements GroupNumberService {
 
     private final GroupNumberRepository groupNumberRepository;
 
+    private final GroupNumberMapper groupNumberMapper;
+
     @Override
-    public void create(GroupNumber groupNumber) {
-        groupNumberRepository.save(groupNumber);
+    public GroupNumber create(GroupNumberDTO groupNumberDTO) {
+       return groupNumberRepository.save(groupNumberMapper.toEntity(groupNumberDTO));
     }
 
     @Override
-    public GroupNumber update(GroupNumber groupNumber) {
-        return groupNumberRepository.save(groupNumber);
+    public GroupNumber update(GroupNumberDTO groupNumberDTO) {
+        return groupNumberRepository.save(groupNumberMapper.toEntity(groupNumberDTO));
     }
 
     @Override

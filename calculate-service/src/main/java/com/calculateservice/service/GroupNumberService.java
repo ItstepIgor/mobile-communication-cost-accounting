@@ -1,14 +1,15 @@
 package com.calculateservice.service;
 
+import com.calculateservice.dto.GroupNumberDTO;
 import com.calculateservice.entity.GroupNumber;
 
 import java.util.List;
 
 public interface GroupNumberService {
 
-    void create(GroupNumber groupNumber);
+    GroupNumber create(GroupNumberDTO groupNumberDTO);
 
-    GroupNumber update(GroupNumber groupNumber);
+    GroupNumber update(GroupNumberDTO groupNumberDTO);
 
     List<GroupNumber> findAll();
 
