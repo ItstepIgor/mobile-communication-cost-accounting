@@ -176,6 +176,7 @@ VALUES (1, 'А/пл.:План Комфорт 4'),
        (171, 'Добавление услуги SMS Роуминг'),
        (172, 'Добавление услуги Телематика-5-Сервер');
 
+ALTER TABLE monthly_call_service_list ALTER COLUMN id RESTART WITH (SELECT MAX(id) FROM monthly_call_service_list) + 1;
 
 --changeset igor:2
 
