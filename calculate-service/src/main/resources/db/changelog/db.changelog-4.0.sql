@@ -19,7 +19,7 @@ VALUES (1, 'Руководители'),
        (8, 'Сельское хозяйство'),
        (9, 'Общая группа');
 
-ALTER TABLE group_number ALTER COLUMN id RESTART WITH (SELECT MAX(id) FROM group_number) + 1;
+select setval('group_number_id_seq', (select max(id) from group_number));
 
 --changeset igor:3
 
@@ -1538,7 +1538,7 @@ VALUES (1, 291025801, 6, 1),
        (1512, 333578589, 3, 1),
        (1513, 333786670, 7, 1);
 
-ALTER TABLE phone_number ALTER COLUMN id RESTART WITH (SELECT MAX(id) FROM phone_number) + 1;
+select setval('phone_number_id_seq', (select max(id) from phone_number));
 
 --changeset igor:4
 
@@ -1584,7 +1584,7 @@ VALUES (1, 'MMS исходящие национальные'),
        (39, 'Исходящие по РБ в Wi-Fi'),
        (40, 'MMS исходящие международные');
 
-ALTER TABLE one_time_call_service ALTER COLUMN id RESTART WITH (SELECT MAX(id) FROM one_time_call_service) + 1;
+select setval('one_time_call_service_id_seq', (select max(id) from one_time_call_service));
 
 --changeset igor:5
 
@@ -1638,7 +1638,7 @@ VALUES (1, 'Звонки внутри сети с 8-00 до 18-00', 13, '07:59:5
        (47, 'Международные звонки (Др. страны) с 8-00 до 18-00', 34, '07:59:59', '18:00:00'),
        (48, 'Звонки по РБ в Wi-Fi с 8-00 до 18-00', 39, '07:59:59', '18:00:00');
 
-ALTER TABLE rule_one_time_call_service ALTER COLUMN id RESTART WITH (SELECT MAX(id) FROM rule_one_time_call_service) + 1;
+select setval('rule_one_time_call_service_id_seq', (select max(id) from rule_one_time_call_service));
 
 --changeset igor:6
 
