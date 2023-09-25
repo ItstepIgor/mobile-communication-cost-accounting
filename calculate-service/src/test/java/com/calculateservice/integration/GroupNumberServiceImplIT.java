@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @IT
 @RequiredArgsConstructor
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class GroupNumberServiceImplIT {
+class GroupNumberServiceImplIT extends IntegrationTestBase{
 
     private final GroupNumberService groupNumberService;
 
