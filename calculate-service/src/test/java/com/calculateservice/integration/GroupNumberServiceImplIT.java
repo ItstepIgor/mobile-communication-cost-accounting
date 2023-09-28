@@ -28,7 +28,7 @@ class GroupNumberServiceImplIT extends IntegrationTestBase{
     @Order(1)
     void findAll() {
 
-        List<GroupNumber> actualResult = groupNumberService.findAll();
+        List<GroupNumberDTO> actualResult = groupNumberService.findAll();
 
         assertEquals(9, actualResult.size());
     }
@@ -37,7 +37,7 @@ class GroupNumberServiceImplIT extends IntegrationTestBase{
     @Order(2)
     void findById() {
 
-        GroupNumber actualResult = groupNumberService.findById(GROPE_ID_1);
+        GroupNumberDTO actualResult = groupNumberService.findById(GROPE_ID_1);
 
         assertEquals("Руководители", actualResult.getGroupNumberName());
     }
@@ -47,9 +47,9 @@ class GroupNumberServiceImplIT extends IntegrationTestBase{
     void create() {
         GroupNumberDTO groupNumberDTO = new GroupNumberDTO(GROPE_ID_10, "TestGroup");
 
-        GroupNumber groupNumber = groupNumberService.create(groupNumberDTO);
+        GroupNumberDTO actualResult = groupNumberService.create(groupNumberDTO);
 
-        assertEquals(groupNumberDTO.getGroupNumberName(), groupNumber.getGroupNumberName());
+        assertEquals(groupNumberDTO.getGroupNumberName(), actualResult.getGroupNumberName());
 
     }
 
@@ -71,15 +71,15 @@ class GroupNumberServiceImplIT extends IntegrationTestBase{
 
         GroupNumberDTO groupNumberDTO = new GroupNumberDTO(GROPE_ID_10, "TestGroup");
 
-        GroupNumber groupNumber = groupNumberService.create(groupNumberDTO);
+        GroupNumberDTO groupNumberActul = groupNumberService.create(groupNumberDTO);
 
-        List<GroupNumber> actualResult = groupNumberService.findAll();
+        List<GroupNumberDTO> actualResult = groupNumberService.findAll();
 
         assertEquals(10, actualResult.size());
 
-        groupNumberService.delete(groupNumber.getId());
+        groupNumberService.delete(groupNumberActul.getId());
 
-        assertNull(groupNumberService.findById(groupNumber.getId()));
+        assertNull(groupNumberService.findById(groupNumberActul.getId()));
 
         assertEquals(9, groupNumberService.findAll().size());
 
