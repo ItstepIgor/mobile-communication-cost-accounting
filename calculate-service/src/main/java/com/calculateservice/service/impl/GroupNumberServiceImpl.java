@@ -4,6 +4,7 @@ import com.calculateservice.dto.GroupNumberDTO;
 import com.calculateservice.entity.GroupNumber;
 import com.calculateservice.repository.GroupNumberRepository;
 import com.calculateservice.service.GroupNumberService;
+import com.calculateservice.service.mapper.GroupNumberListMapper;
 import com.calculateservice.service.mapper.GroupNumberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,9 +20,11 @@ public class GroupNumberServiceImpl implements GroupNumberService {
 
     private final GroupNumberMapper groupNumberMapper;
 
+    private final GroupNumberListMapper groupNumberListMapper;
+
     @Override
-    public GroupNumber create(GroupNumberDTO groupNumberDTO) {
-       return groupNumberRepository.save(groupNumberMapper.toEntity(groupNumberDTO));
+    public GroupNumberDTO create(GroupNumberDTO groupNumberDTO) {
+        return groupNumberMapper.toDTO(groupNumberRepository.save(groupNumberMapper.toEntity(groupNumberDTO)));
     }
 
     @Override
@@ -30,13 +33,13 @@ public class GroupNumberServiceImpl implements GroupNumberService {
     }
 
     @Override
-    public List<GroupNumber> findAll() {
-        return groupNumberRepository.findAll();
+    public List<GroupNumberDTO> findAll() {
+        return groupNumberListMapper.toListDTO(groupNumberRepository.findAll());
     }
 
     @Override
-    public GroupNumber findById(long id) {
-        return groupNumberRepository.findById(id).orElse(null);
+    public GroupNumberDTO findById(long id) {
+        return groupNumberMapper.toDTO(groupNumberRepository.findById(id).orElse(null));
     }
 
     @Override

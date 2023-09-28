@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface GroupNumberService {
 
-    GroupNumber create(GroupNumberDTO groupNumberDTO);
+    GroupNumberDTO create(GroupNumberDTO groupNumberDTO);
 
     GroupNumber update(GroupNumberDTO groupNumberDTO);
 
-    List<GroupNumber> findAll();
+    List<GroupNumberDTO> findAll();
 
-    GroupNumber findById(long id);
+    GroupNumberDTO findById(long id);
 
     void delete (Long id);
 }
