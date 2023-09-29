@@ -5,6 +5,7 @@ import com.calculateservice.service.GroupNumberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,8 +43,8 @@ public class GroupNumberController {
             description = "Добавление новой группы"
     )
     @PostMapping
-    public void createGroupNumber(@RequestBody GroupNumberDTO groupNumberDTO) {
-        groupNumberService.create(groupNumberDTO);
+    public ResponseEntity<GroupNumberDTO> createGroupNumber(@RequestBody GroupNumberDTO groupNumberDTO) {
+        return ResponseEntity.status(201).body(groupNumberService.create(groupNumberDTO));
     }
 
     @Operation(
@@ -51,8 +52,8 @@ public class GroupNumberController {
             description = "Изменение группы"
     )
     @PutMapping
-    public void updateGroupNumber(@RequestBody GroupNumberDTO groupNumberDTO) {
-        groupNumberService.update(groupNumberDTO);
+    public ResponseEntity<GroupNumberDTO> updateGroupNumber(@RequestBody GroupNumberDTO groupNumberDTO) {
+        return ResponseEntity.ok().body(groupNumberService.update(groupNumberDTO));
     }
 
     @Operation(
