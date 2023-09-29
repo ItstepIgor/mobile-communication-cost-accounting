@@ -1,7 +1,6 @@
 package com.calculateservice.service.impl;
 
 import com.calculateservice.dto.GroupNumberDTO;
-import com.calculateservice.entity.GroupNumber;
 import com.calculateservice.repository.GroupNumberRepository;
 import com.calculateservice.service.GroupNumberService;
 import com.calculateservice.service.mapper.GroupNumberListMapper;
@@ -28,8 +27,8 @@ public class GroupNumberServiceImpl implements GroupNumberService {
     }
 
     @Override
-    public GroupNumber update(GroupNumberDTO groupNumberDTO) {
-        return groupNumberRepository.save(groupNumberMapper.toEntity(groupNumberDTO));
+    public GroupNumberDTO update(GroupNumberDTO groupNumberDTO) {
+        return groupNumberMapper.toDTO(groupNumberRepository.save(groupNumberMapper.toEntity(groupNumberDTO)));
     }
 
     @Override

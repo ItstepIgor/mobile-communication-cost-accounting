@@ -7,7 +7,10 @@ import com.calculateservice.service.MobileOperatorService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {GroupNumberService.class, MobileOperatorService.class})
+@Mapper(componentModel = "spring",
+        uses = {GroupNumberService.class,
+                MobileOperatorService.class,
+                GroupNumberMapper.class})
 public interface PhoneNumberMapper {
 
 
@@ -16,9 +19,8 @@ public interface PhoneNumberMapper {
     @Mapping(target = "creationDate", source = "creationDate", dateFormat = "yyyy-MM-dd HH:mm:ss")
     PhoneNumberDTO toDTO(PhoneNumber phoneNumber);
 
-
     @Mapping(target = "groupNumber", source = "groupNumberId")
     @Mapping(target = "mobileOperator", source = "mobileOperatorId")
-    @Mapping(target = "creationDate", dateFormat = "yyyy-MM-dd HH:mm:ss", defaultExpression ="java(LocalDateTime.now())")
+    @Mapping(target = "creationDate", dateFormat = "yyyy-MM-dd HH:mm:ss", defaultExpression = "java(LocalDateTime.now())")
     PhoneNumber toEntity(PhoneNumberDTO phoneNumberDto);
 }

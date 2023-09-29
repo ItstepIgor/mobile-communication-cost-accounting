@@ -1,7 +1,6 @@
 package com.calculateservice.integration;
 
 import com.calculateservice.dto.GroupNumberDTO;
-import com.calculateservice.entity.GroupNumber;
 import com.calculateservice.integration.annotation.IT;
 import com.calculateservice.service.GroupNumberService;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +57,7 @@ class GroupNumberServiceImplIT extends IntegrationTestBase{
     void update() {
         GroupNumberDTO groupNumberDTO = new GroupNumberDTO(GROPE_ID_1, "TestGroup");
 
-        GroupNumber groupNumber = groupNumberService.update(groupNumberDTO);
+        GroupNumberDTO groupNumber = groupNumberService.update(groupNumberDTO);
 
         assertEquals(groupNumberDTO.getGroupNumberName(), groupNumber.getGroupNumberName());
 
