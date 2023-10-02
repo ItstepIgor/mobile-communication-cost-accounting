@@ -34,7 +34,18 @@ class GroupNumberControllerIT {
     }
 
     @Test
-    void findGroupById() {
+    void findGroupById() throws Exception {
+
+        mockMvc.perform(
+                        get("/group/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                //библиотека org.hamcrest.Matchers
+                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.groupNumberName", is("Руководители")))
+                //библиотека org.springframework.test.web.servlet.result
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.groupNumberName").value("Руководители"));
     }
 
     @Test
@@ -52,10 +63,33 @@ class GroupNumberControllerIT {
     }
 
     @Test
-    void updateGroupNumber() {
+    void updateGroupNumber() throws Exception {
+
+        GroupNumberDTO groupNumberDTO = new GroupNumberDTO(1, "Проверка");
+
+        mockMvc.perform(
+                        put("/group")
+                                .content(objectMapper.writeValueAsString(groupNumberDTO))
+                                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.id").value("1"))
+                .andExpect(jsonPath("$.groupNumberName").value("Проверка"));
+
     }
 
     @Test
-    void deleteGroupNumber() {
+    void deleteGroupNumber() throws Exception {
+
+        GroupNumberDTO groupNumberDTO = new GroupNumberDTO(10, "Проверка");
+
+        mockMvc.perform(
+                post("/group")
+                        .content(objectMapper.writeValueAsString(groupNumberDTO))
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        mockMvc.perform(
+                        delete("/group/{id}", 10))
+                .andExpect(status().is2xxSuccessful());
+
     }
 }
