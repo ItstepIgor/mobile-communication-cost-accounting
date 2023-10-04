@@ -17,7 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @IT
 @AutoConfigureMockMvc
 @RequiredArgsConstructor
-class GroupNumberControllerIT {
+class GroupNumberControllerIT extends IntegrationTestBase{
 
     private final MockMvc mockMvc;
 
