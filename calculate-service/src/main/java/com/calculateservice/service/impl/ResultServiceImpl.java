@@ -2,6 +2,7 @@ package com.calculateservice.service.impl;
 
 import com.calculateservice.dto.AllExpensesByPhoneNumberDTO;
 import com.calculateservice.entity.*;
+import com.calculateservice.repository.PhoneNumberRepository;
 import com.calculateservice.repository.ResultRepository;
 import com.calculateservice.service.*;
 import com.calculateservice.util.Filters;
@@ -28,7 +29,7 @@ public class ResultServiceImpl implements ResultService {
 
     private final MonthlyCallServiceService monthlyCallServiceService;
 
-    private final PhoneNumberService phoneNumberService;
+    private final PhoneNumberRepository phoneNumberRepository;
 
     private final LandlineNumberService landlineNumberService;
 
@@ -37,7 +38,7 @@ public class ResultServiceImpl implements ResultService {
     @Override
     public void calcResult(LocalDate date) {
         List<Result> results = new ArrayList<>();
-        List<PhoneNumber> phoneNumbers = phoneNumberService.findAll();
+        List<PhoneNumber> phoneNumbers = phoneNumberRepository.findAll();
         List<String> stringListLandlineNumber = landlineNumberService.findAllLandlineNumber()
                 .stream().map(LandlineNumber::getNumber).toList();
         List<Call> allCalcByDate = callService.findAllByDate(date);
@@ -115,7 +116,7 @@ public class ResultServiceImpl implements ResultService {
 
             Result result = Result.builder()
                     .ownerName(String.valueOf(phoneNumber.getNumber()))
-                    .phoneNumber(phoneNumberService.findById(phoneNumber.getId()))
+                    .phoneNumber(phoneNumberRepository.findById(phoneNumber.getId()).orElse(null))
                     .invoiceDate(date)
                     .sum(callSumWithNDS.add(callServiceSum))
                     .build();

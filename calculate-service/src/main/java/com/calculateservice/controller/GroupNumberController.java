@@ -13,11 +13,23 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/group")
-@Tag(name = "Редактирование и добавление групп абонентов")
+@Tag(name = "Редактирование и добавление групп абонентов, добавление правил расчета к группам")
 @CrossOrigin("http://localhost:8765")
 public class GroupNumberController {
 
+
     private final GroupNumberService groupNumberService;
+
+
+    @Operation(
+            summary = "Добавление правил",
+            description = "Добавление правил для одноразовых услуг к группам"
+    )
+    @GetMapping("/rule")
+    public void addRuleToGroupNumber(@RequestParam Long groupId, @RequestParam Long ruleId) {
+        groupNumberService.addRuleToGroup(groupId, ruleId);
+    }
+
 
     @Operation(
             summary = "Для получения информации по группам",
@@ -61,7 +73,7 @@ public class GroupNumberController {
             description = "Удаление группы"
     )
     @DeleteMapping("/{id}")
-    public void deleteGroupNumber (@PathVariable long id){
+    public void deleteGroupNumber(@PathVariable long id) {
         groupNumberService.delete(id);
     }
 
