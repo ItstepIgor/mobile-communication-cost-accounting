@@ -59,7 +59,7 @@ public class PhoneNumber {
         monthlyCallServiceList.getPhoneNumbers().add(this);
     }
 
-    public void removeRule(MonthlyCallServiceList monthlyCallServiceList) {
+    public void removeMonthlyCallServiceList(MonthlyCallServiceList monthlyCallServiceList) {
         this.monthlyCallServiceLists.remove(monthlyCallServiceList);
         monthlyCallServiceList.getPhoneNumbers().remove(this);
     }

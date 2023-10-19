@@ -15,4 +15,6 @@ public interface GroupNumberService {
     GroupNumberDTO findById(long id);
 
     void delete (Long id);
+
+    void addRuleToGroup(Long groupId, Long ruleId);
 }

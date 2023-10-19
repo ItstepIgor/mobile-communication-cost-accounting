@@ -5,6 +5,7 @@ import com.calculateservice.entity.PhoneNumber;
 import com.calculateservice.entity.PhoneNumberPojo;
 import com.calculateservice.repository.PhoneNumberRepository;
 import com.calculateservice.service.PhoneNumberService;
+import com.calculateservice.service.mapper.PhoneNumberListMapper;
 import com.calculateservice.service.mapper.PhoneNumberMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,14 +20,16 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
 
     private final PhoneNumberMapper phoneNumberMapper;
 
+    private final PhoneNumberListMapper phoneNumberListMapper;
+
     @Override
-    public List<PhoneNumber> findAll() {
-        return phoneNumberRepository.findAll();
+    public List<PhoneNumberDTO> findAll() {
+        return phoneNumberListMapper.toListDTO(phoneNumberRepository.findAll());
     }
 
     @Override
-    public PhoneNumber findById(Long id) {
-        return phoneNumberRepository.findById(id).orElse(null);
+    public PhoneNumberDTO findById(Long id) {
+        return phoneNumberMapper.toDTO(phoneNumberRepository.findById(id).orElse(null));
     }
 
     @Override
