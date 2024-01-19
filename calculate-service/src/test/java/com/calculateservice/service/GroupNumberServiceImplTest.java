@@ -2,7 +2,10 @@ package com.calculateservice.service;
 
 import com.calculateservice.dto.GroupNumberDTO;
 import com.calculateservice.entity.GroupNumber;
+import com.calculateservice.entity.OneTimeCallService;
+import com.calculateservice.entity.RuleOneTimeCallService;
 import com.calculateservice.repository.GroupNumberRepository;
+import com.calculateservice.repository.RuleOneTimeCallServiceRepository;
 import com.calculateservice.service.impl.GroupNumberServiceImpl;
 import com.calculateservice.service.mapper.GroupNumberListMapper;
 import com.calculateservice.service.mapper.GroupNumberMapper;
@@ -10,18 +13,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalTime;
 import java.util.Optional;
 
 import java.util.List;
 
-//@IT
 @ExtendWith(MockitoExtension.class)
-//@SpringBootTest
 class GroupNumberServiceImplTest {
 
     @Mock
@@ -29,9 +32,12 @@ class GroupNumberServiceImplTest {
 
     @Mock
     private GroupNumberMapper groupNumberMapper;
-
+    //Mapper можно заменить @Spy и использовать GroupNumberMapperImpl
     @Mock
     private GroupNumberListMapper groupNumberListMapper;
+
+    @Mock
+    private RuleOneTimeCallServiceRepository ruleOneTimeCallServiceRepository;
 
     @InjectMocks
     private GroupNumberServiceImpl groupNumberService;
@@ -41,7 +47,6 @@ class GroupNumberServiceImplTest {
     private GroupNumber groupNumberTwo;
     private GroupNumberDTO groupNumberDTOTwo;
 
-    private List<GroupNumber> groupNumbers;
     private List<GroupNumberDTO> groupNumberDTOS;
 
     private static final Long ID = 1L;
@@ -68,16 +73,16 @@ class GroupNumberServiceImplTest {
     @Test
     void findAll() {
         groupNumberDTOS = List.of(groupNumberDTOOne, groupNumberDTOTwo);
-        groupNumbers = List.of(groupNumberOne, groupNumberTwo);
+        List<GroupNumber> groupNumbers = List.of(groupNumberOne, groupNumberTwo);
 
         Mockito.when(groupNumberRepository.findAll()).thenReturn(groupNumbers);
         Mockito.when(groupNumberListMapper.toListDTO(groupNumbers)).thenReturn(groupNumberDTOS);
 
-        List<GroupNumberDTO> groupNumbers = groupNumberService.findAll();
+        List<GroupNumberDTO> groupNumbersDTO = groupNumberService.findAll();
 
-        Assertions.assertEquals(2, groupNumbers.size());
-        Assertions.assertEquals(groupNumberDTOOne, groupNumbers.get(0));
-        Assertions.assertEquals(groupNumberDTOTwo, groupNumbers.get(1));
+        Assertions.assertEquals(2, groupNumbersDTO.size());
+        Assertions.assertEquals(groupNumberDTOOne, groupNumbersDTO.get(0));
+        Assertions.assertEquals(groupNumberDTOTwo, groupNumbersDTO.get(1));
     }
 
     @Test
@@ -95,13 +100,73 @@ class GroupNumberServiceImplTest {
 
     @Test
     void create() {
+
+        Mockito.doReturn(groupNumberOne).when(groupNumberRepository).save(Mockito.any());
+        Mockito.doReturn(groupNumberDTOOne).when(groupNumberMapper).toDTO(groupNumberOne);
+
+        GroupNumberDTO actualResult = groupNumberService.create(groupNumberDTOOne);
+
+        Assertions.assertEquals(groupNumberDTOOne, actualResult);
+
     }
 
     @Test
     void update() {
+        Mockito.doReturn(groupNumberOne).when(groupNumberRepository).save(Mockito.any());
+        Mockito.doReturn(groupNumberDTOOne).when(groupNumberMapper).toDTO(groupNumberOne);
+
+        groupNumberDTOOne.setGroupNumberName("Test");
+        GroupNumberDTO actualResult = groupNumberService.update(groupNumberDTOOne);
+        //перехватываем значение переданное в метод и сравнивааем его со значением с которым вызвали метод mapper
+        ArgumentCaptor<GroupNumber> argumentCaptor = ArgumentCaptor.forClass(GroupNumber.class);
+        Mockito.verify(groupNumberMapper).toDTO(argumentCaptor.capture());
+        Mockito.verify(groupNumberRepository, Mockito.times(1)).save(Mockito.any());
+
+        //Сравниваем значением с которым вызвали метод mapper
+        Assertions.assertEquals(groupNumberOne, argumentCaptor.getValue());
+        Assertions.assertNotNull(actualResult);
+        Assertions.assertEquals("Test", actualResult.getGroupNumberName());
     }
 
     @Test
     void delete() {
+        Mockito.doNothing().when(groupNumberRepository).deleteById(ID);
+
+        groupNumberService.delete(ID);
+        ArgumentCaptor<Long> argumentCaptor = ArgumentCaptor.forClass(Long.class);
+
+        Mockito.verify(groupNumberRepository).deleteById(argumentCaptor.capture());
+        Assertions.assertEquals(ID, argumentCaptor.getValue());
+        Mockito.verify(groupNumberRepository, Mockito.times(1)).deleteById(Mockito.anyLong());
+    }
+
+    @Test
+    void addRuleToGroup() {
+        OneTimeCallService oneTimeCallService = OneTimeCallService.builder()
+                .id(13)
+                .oneTimeCallServiceName("Исходящие внутри сети")
+                .build();
+
+        RuleOneTimeCallService ruleOneTimeCallService = RuleOneTimeCallService.builder()
+                .id(1)
+                .ruleName("Звонки внутри сети с 8-00 до 18-00")
+                .oneTimeCallService(oneTimeCallService)
+                .startPayment(LocalTime.parse("07:59:59"))
+                .endPayment(LocalTime.parse("18:00:00"))
+                .build();
+
+
+        Mockito.doReturn(Optional.of(groupNumberOne)).when(groupNumberRepository).findById(ID);
+
+        Mockito.doReturn(Optional.of(ruleOneTimeCallService)).when(ruleOneTimeCallServiceRepository).findById(Mockito.anyLong());
+
+        groupNumberService.addRuleToGroup(groupNumberOne.getId(), ruleOneTimeCallService.getId());
+
+        ArgumentCaptor<GroupNumber> argumentCaptor = ArgumentCaptor.forClass(GroupNumber.class);
+
+        Mockito.verify(groupNumberRepository).save(argumentCaptor.capture());
+
+        Assertions.assertEquals("Test", argumentCaptor.getValue());
+
     }
 }

@@ -1,13 +1,12 @@
 package com.calculateservice.integration;
 
 import com.calculateservice.dto.GroupNumberDTO;
+import com.calculateservice.dto.RuleOneTimeCallServiceDTO;
 import com.calculateservice.integration.annotation.IT;
 import com.calculateservice.service.GroupNumberService;
+import com.calculateservice.service.RuleService;
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 
 import java.util.List;
 
@@ -20,8 +19,12 @@ class GroupNumberServiceImplIT extends IntegrationTestBase{
 
     private final GroupNumberService groupNumberService;
 
+    private final RuleService ruleService;
+
     private static final Long GROPE_ID_1 = 1L;
+    private static final Long GROPE_ID_2 = 2L;
     private static final Long GROPE_ID_10 = 10L;
+    private static final Long RULE_ID_1 = 13L;
 
     @Test
     @Order(1)
@@ -81,6 +84,21 @@ class GroupNumberServiceImplIT extends IntegrationTestBase{
         assertNull(groupNumberService.findById(groupNumberActul.getId()));
 
         assertEquals(9, groupNumberService.findAll().size());
+
+    }
+
+
+    @Test
+    @Order(6)
+    void addRuleToGroup() {
+
+        GroupNumberDTO groupNumber = groupNumberService.findById(GROPE_ID_2);
+
+        RuleOneTimeCallServiceDTO rule = ruleService.findById(RULE_ID_1);
+
+        groupNumberService.addRuleToGroup(groupNumber.getId(), rule.getId());
+
+
 
     }
 
