@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping("/calls")
 @Tag(name = "Импорт данных из файла excel", description = "Импортируються данные по звонкам и всем услугам из excel в БД " +
         "и отправка при необходимости в другой сервис")
-@CrossOrigin("http://localhost:8765")
+@CrossOrigin
 public class CallController {
 
     private final ImportService importService;
