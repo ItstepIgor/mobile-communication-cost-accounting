@@ -98,7 +98,6 @@ public class ReportServiceImpl implements ReportService {
 
     private static Map<String, Object> getMap() {
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("logo", ClassLoader.getSystemResource("img.jpg").getPath());
         parameters.put("logo1", ClassLoader.getSystemResourceAsStream("img.jpg"));
         return parameters;
     }

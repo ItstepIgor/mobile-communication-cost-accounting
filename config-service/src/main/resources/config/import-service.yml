@@ -27,5 +27,7 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
+  docker:
+    host: ${HOSTNAME:http://localhost:8765/import-service}
 topic:
   name: t.call

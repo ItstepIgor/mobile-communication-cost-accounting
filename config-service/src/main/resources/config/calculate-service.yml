@@ -29,5 +29,7 @@ spring:
   jpa:
     database: postgresql
 #    show-sql: true
+  docker:
+    host: ${HOSTNAME:http://localhost:8765/calculate-service}
 topic:
   name: t.call
