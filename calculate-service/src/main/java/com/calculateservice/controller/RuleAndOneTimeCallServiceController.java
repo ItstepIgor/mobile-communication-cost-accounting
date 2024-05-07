@@ -27,8 +27,8 @@ public class RuleAndOneTimeCallServiceController {
     private final RuleService ruleService;
 
     @Operation(
-            summary = "Получение списка одноразовых сервисов",
-            description = "Получение списка одноразовых сервисов," +
+            summary = "Получение списка одноразовых услуг",
+            description = "Получение списка одноразовых услуг," +
                     " которые не имеют периодической абонентской платы "
     )
     @GetMapping("/getonetimeservice")
@@ -59,7 +59,7 @@ public class RuleAndOneTimeCallServiceController {
 
     @Operation(
             summary = "Создание правила",
-            description = "Добавление нового правила"
+            description = "Добавление нового правила для услуги"
     )
     @PostMapping
     public ResponseEntity<RuleOneTimeCallServiceDTO> createRule(

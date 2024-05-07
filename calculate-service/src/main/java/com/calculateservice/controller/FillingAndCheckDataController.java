@@ -1,6 +1,5 @@
 package com.calculateservice.controller;
 
-import com.calculateservice.dto.AllCallServiceDTO;
 import com.calculateservice.service.FillingDataBaseService;
 import com.calculateservice.service.IndividualResultService;
 import com.calculateservice.service.ResultService;
@@ -12,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,10 +25,8 @@ public class FillingAndCheckDataController {
 
     private final IndividualResultService individualResultService;
 
-    //    @CrossOrigin
-
     @Operation(
-            summary = "Заполнение БД",
+            summary = "При расчете вызываем этот метод первым Заполнение БД",
             description = "Вызывается метод заполнения данных по номерам телефонов и услугам указываем дату "
     )
     @GetMapping("/service")
@@ -43,21 +39,7 @@ public class FillingAndCheckDataController {
     }
 
     @Operation(
-            summary = "Заменить этот метод на другой необходимый",
-            description = "Вызывается метод сверяющий а/п ежемесячных сервисов с текущей и возвращает список отличающихся а/п "
-    )
-    @GetMapping("/check")
-    public List<AllCallServiceDTO> checkSumMonthlyCallService(@RequestParam(value = "date")
-                                                              @DateTimeFormat(iso = DateTimeFormat.ISO.DATE,
-                                                                      fallbackPatterns = {"dd/MM/yy", "dd.MM.yyyy", "dd-MM-yyyy"})
-                                                              @Parameter(description = "Параметр даты: dd/MM/yy, dd.MM.yyyy, dd-MM-yyyy")
-                                                              LocalDate date) {
-        return null;
-    }
-
-
-    @Operation(
-            summary = "Провести итоговый расчет",
+            summary = "При расчете вызываем этот метод  после заполнения данных Провести итоговый расчет",
             description = "Вызывается метод и выполняется расчет удержания по всем номерам телефонов с указанием даты"
     )
     @GetMapping("/calc")
@@ -71,7 +53,7 @@ public class FillingAndCheckDataController {
 
     @Operation(
             summary = "Провести итоговый расчет по одному номеру",
-            description = "Вызывается метод и выполняется расчет удержания поодному номеру телефона"
+            description = "Вызывается метод и выполняется расчет удержания по одному номеру телефона"
     )
     @GetMapping("/calcindividul")
     public void calculateIndividualResult(@RequestParam(value = "date")

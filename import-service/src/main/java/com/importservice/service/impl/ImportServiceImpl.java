@@ -82,6 +82,7 @@ public class ImportServiceImpl implements ImportService {
         try (InputStream inputStreams = MultiPartArchiveExtractor.extractFromArchive(fileNames.get(0))) {
             reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
         }
+        storageService.deleteAll();
         saveToDataBase(reportMTS);
     }
 
