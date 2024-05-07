@@ -28,7 +28,7 @@ public class PhoneNumberAndMonthlyCallServiceForCalcController {
 
     @Operation(
             summary = "Добавление ежемесячных услуг",
-            description = "Добавление ежемесячных услуг к номерам"
+            description = "Добавление ежемесячных услуг к номерам (за которые оплачиваюет предприятие)"
     )
     @GetMapping("/addservice")
     public void addMonthlyCallServiceToNumber(@RequestParam Long numberId, @RequestParam Long serviceId) {
@@ -65,8 +65,8 @@ public class PhoneNumberAndMonthlyCallServiceForCalcController {
     }
 
     @Operation(
-            summary = "Получение списка ежемесячных сервисов",
-            description = "Получение списка ежемесячных сервисов," +
+            summary = "Получение списка ежемесячных услуг",
+            description = "Получение списка ежемесячных услуг," +
                     " которые имеют периодическую абонентскую плату "
     )
     @GetMapping("/getservices")

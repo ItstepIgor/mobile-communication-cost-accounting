@@ -7,12 +7,14 @@ import com.importservice.service.FindAllInformationOnMTS;
 import com.importservice.service.ImportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,8 +38,8 @@ public class CallController {
 
 
     @Operation(
-            summary = "Импорт данных по A1",
-            description = "Вызывается метод заполнения данных по номерам телефонов и услугам"
+            summary = "Импорт данных по A1 из одного файла",
+            description = "Используем этот метод если у нас один файл ZIP архива"
     )
     @PostMapping(value = "/importa1", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadZipFile(@RequestParam("file") @Parameter(description = "Загружаем файл ZIP") MultipartFile file) {
@@ -45,7 +47,7 @@ public class CallController {
     }
 
     @Operation(
-            summary = "Импорт данных по МТС",
+            summary = "Импорт данных по МТС из одного файла",
             description = "Используем этот метод если у нас один файл RAR архива"
     )
     @PostMapping(value = "/importmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -54,32 +56,36 @@ public class CallController {
     }
 
     @Operation(
-            summary = "Метод для получения данных из нескольких файлов RAR",
-            description = "Через swagger отправка не работает, используем postman "
+            summary = "Импорт данных по МТС из нескольких файлов",
+            description = "Метод для загрузки на сервер и записи данных в БД из нескольких файлов RAR от МТС",
+            requestBody = @RequestBody(content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
     )
     @PostMapping(value = "/multiimportmts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void multiImportMTS(@RequestParam(value = "files") MultipartFile[] files) {
+    public void multiImportMTS(@Parameter(description = "Добавляем файлы RAR по очереди")
+                                   @org.springframework.web.bind.annotation.RequestBody MultipartFile[] files) {
         importService.multiImportMTS(files);
     }
 
-    @Operation(
-            summary = "Метод только для загрузки RAR файлов",
-            description = "Используем этот метод если у нас несколько файлов загружаем их по очереди"
-    )
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void upload(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
-        importService.saveToFile(file);
-    }
 
-
-    @Operation(
-            summary = "Метод для извлечения данных",
-            description = "Используем этот метод толоко после загрузки нескольких файлов по очереди методом /upload"
-    )
-    @PostMapping(value = "/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void extract(@RequestParam("file") @Parameter(description = "Выбираем файл *.part01.rar") MultipartFile file) {
-        importService.extract(file.getOriginalFilename());
-    }
+//    //Методы использовались когда не работала одновременная загрузка из нескольких файлов
+//    @Operation(
+//            summary = "Метод только для загрузки нескольких RAR файлов МТС на сервер",
+//            description = "Используем этот метод если у нас несколько файлов загружаем их по очереди"
+//    )
+//    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public void upload(@RequestParam("file") @Parameter(description = "Загружаем файл RAR") MultipartFile file) {
+//        importService.saveToFile(file);
+//    }
+//
+//
+//    @Operation(
+//            summary = "Метод для записи в БД данных после загрузки нескольких RAR от МТС",
+//            description = "Используем этот метод толоко после загрузки нескольких файлов по очереди методом /upload"
+//    )
+//    @PostMapping(value = "/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public void extract(@RequestParam("file") @Parameter(description = "Выбираем файл *.part01.rar") MultipartFile file) {
+//        importService.extract(file.getOriginalFilename());
+//    }
 
     @Operation(
             summary = "Для получения информации по всем сервисам А1",

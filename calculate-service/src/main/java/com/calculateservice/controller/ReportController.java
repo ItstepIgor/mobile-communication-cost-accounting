@@ -1,6 +1,7 @@
 package com.calculateservice.controller;
 
 import com.calculateservice.service.ReportService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,11 @@ public class ReportController {
 
     private static final String CONTENT_TYPE = "application/x-pdf";
 
+
+    @Operation(
+            summary = "Получение ежемесячного отчета",
+            description = "Получаем отчет за указанный месяц"
+    )
     @GetMapping(value = "/result")
     @ResponseBody
     public void getReportResult(@RequestParam(value = "localDate")
@@ -40,6 +46,10 @@ public class ReportController {
         JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
     }
 
+    @Operation(
+            summary = "Получение отчета по одному номеру",
+            description = "Получение отчета по одному расчитанному номеру "
+    )
     @GetMapping(value = "/individualresult")
     @ResponseBody
     public void getReportIndividualResult(HttpServletResponse responseReportBonus) throws JRException, IOException {
@@ -50,6 +60,10 @@ public class ReportController {
         JasperExportManager.exportReportToPdfStream(jasperPrint, outStream);
     }
 
+    @Operation(
+            summary = "Получение списка номеров телефонов",
+            description = "Получение списка номеров телефонов по указаному оператору "
+    )
     @GetMapping(value = "/phone/{id}")
     @ResponseBody
     public void getReportPhone(@Parameter(description = "Код оператора: 1 - А1, 2 - МТС")

@@ -22,7 +22,7 @@ public class GroupNumberController {
 
 
     @Operation(
-            summary = "Добавление правил",
+            summary = "Добавление правил к группе",
             description = "Добавление правил для одноразовых услуг к группам"
     )
     @GetMapping("/rule")
