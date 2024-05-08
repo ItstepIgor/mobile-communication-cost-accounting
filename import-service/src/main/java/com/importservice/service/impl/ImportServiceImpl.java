@@ -2,7 +2,6 @@ package com.importservice.service.impl;
 
 import com.importservice.service.*;
 import com.importservice.util.Extractor;
-import com.importservice.util.MultiPartArchiveExtractor;
 import com.importservice.util.Unmarshaller;
 import com.importservice.xml.ReportMTS;
 import lombok.RequiredArgsConstructor;
@@ -36,10 +35,9 @@ public class ImportServiceImpl implements ImportService {
     @SneakyThrows
     public void importA1(MultipartFile file) {
         XSSFWorkbook myExcelBook;
-        //TODO если извлекать из архива этим методом то при повторном извлечении после MTS возникает ошибка
-        // нужно разобраться почему. Так же и импорт MTS если запускать второй раз так же ошибка
-//        try (InputStream inputStream = Extractor.extractFromArchive(file)) {
-        try (InputStream inputStream = Extractor.extractZip(file)) {
+//Можно использовать метод извлесения из ZIP архива
+//        try (InputStream inputStream = Extractor.extractZip(file)) {
+        try (InputStream inputStream = Extractor.extractFromArchive(file)) {
             myExcelBook = new XSSFWorkbook(inputStream);
         }
 
@@ -79,32 +77,34 @@ public class ImportServiceImpl implements ImportService {
         Collections.sort(fileNames);
 
         ReportMTS reportMTS;
-        try (InputStream inputStreams = MultiPartArchiveExtractor.extractFromArchive(fileNames.get(0))) {
+        try (InputStream inputStreams = Extractor.extractFromMultiFileArchive(fileNames.get(0))) {
             reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
         }
         storageService.deleteAll();
         saveToDataBase(reportMTS);
-    }
-
-    @Override
-    @SneakyThrows
-    public void extract(String originalFilename) {
-        ReportMTS reportMTS;
-        try (InputStream inputStreams = MultiPartArchiveExtractor.extractFromArchive(originalFilename)) {
-            reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
-        }
-        storageService.deleteAll();
-        saveToDataBase(reportMTS);
-    }
-
-    @Override
-    public void saveToFile(MultipartFile file) {
-        storageService.init();
-        storageService.save(file);
     }
 
     private void saveToDataBase(ReportMTS reportMTS) {
         periodService.saveImportPeriodMTS(reportMTS);
         callServiceMTS.saveToDataBaseFromFileMTS(reportMTS);
+    }
+
+//Методы использовались когда не работала одновременная загрузка из нескольких файлов
+    @Override
+    @SneakyThrows
+    public void extract(String originalFilename) {
+        ReportMTS reportMTS;
+        try (InputStream inputStreams = Extractor.extractFromMultiFileArchive(originalFilename)) {
+            reportMTS = Unmarshaller.unmarshallerMTS(inputStreams);
+        }
+        storageService.deleteAll();
+        saveToDataBase(reportMTS);
+    }
+
+//Методы использовались когда не работала одновременная загрузка из нескольких файлов
+    @Override
+    public void saveToFile(MultipartFile file) {
+        storageService.init();
+        storageService.save(file);
     }
 }
