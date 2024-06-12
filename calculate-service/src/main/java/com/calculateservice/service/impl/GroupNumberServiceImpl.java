@@ -33,7 +33,9 @@ public class GroupNumberServiceImpl implements GroupNumberService {
 
     @Override
     public GroupNumberDTO update(GroupNumberDTO groupNumberDTO) {
-        return groupNumberMapper.toDTO(groupNumberRepository.save(groupNumberMapper.toEntity(groupNumberDTO)));
+        GroupNumber groupNumber = findGroupNumberById(groupNumberDTO.getId());
+        groupNumber.setGroupNumberName(groupNumberDTO.getGroupNumberName());
+        return groupNumberMapper.toDTO(groupNumberRepository.save(groupNumber));
     }
 
     @Override
@@ -55,7 +57,7 @@ public class GroupNumberServiceImpl implements GroupNumberService {
     public void addRuleToGroup(Long groupId, Long ruleId) {
         RuleOneTimeCallService ruleOneTimeCallServices = getRuleOneTimeCallService(ruleId);
 
-        GroupNumber groupNumber = groupNumberRepository.findById(groupId).orElse(null);
+        GroupNumber groupNumber = findGroupNumberById(groupId);
 
         groupNumber.addRule(ruleOneTimeCallServices);
 
@@ -63,8 +65,25 @@ public class GroupNumberServiceImpl implements GroupNumberService {
 
     }
 
+
+    @Override
+    public void removeRuleFromGroup(Long groupId, Long ruleId) {
+        RuleOneTimeCallService ruleOneTimeCallServices = getRuleOneTimeCallService(ruleId);
+
+        GroupNumber groupNumber = findGroupNumberById(groupId);
+
+        groupNumber.removeRule(ruleOneTimeCallServices);
+
+        groupNumberRepository.save(groupNumber);
+
+    }
+
     private RuleOneTimeCallService getRuleOneTimeCallService(Long id) {
         return ruleOneTimeCallServiceRepository.findById(id).orElse(null);
+    }
+
+    public GroupNumber findGroupNumberById (long id){
+        return groupNumberRepository.findById(id).orElse(null);
     }
 
 }

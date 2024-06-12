@@ -14,8 +14,14 @@ public interface PhoneNumberService {
 
     void update (PhoneNumberDTO phoneNumberDto);
 
+    void delete (long id);
+
     PhoneNumber findPhoneNumberByNumber(Long number);
 
     List<PhoneNumberPojo> getListPhoneNumber (long mobileOperatorId);
+
+    void addMonthlyCallServiceToNumber(Long numberId, Long serviceId);
+
+    void removeMonthlyCallServiceToNumber(Long numberId, Long serviceId);
 
 }

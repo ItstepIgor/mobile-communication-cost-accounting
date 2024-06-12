@@ -1,6 +1,7 @@
 package com.calculateservice.service;
 
 import com.calculateservice.dto.GroupNumberDTO;
+import com.calculateservice.entity.GroupNumber;
 
 import java.util.List;
 
@@ -17,4 +18,8 @@ public interface GroupNumberService {
     void delete (Long id);
 
     void addRuleToGroup(Long groupId, Long ruleId);
+
+    void removeRuleFromGroup(Long groupId, Long ruleId);
+
+    GroupNumber findGroupNumberById (long id);
 }

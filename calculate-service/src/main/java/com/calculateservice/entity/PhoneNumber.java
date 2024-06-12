@@ -12,8 +12,8 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString(exclude = {"monthlyCallServices", "results", "monthlyCallServiceLists"})
-@EqualsAndHashCode(exclude = {"monthlyCallServices", "results", "monthlyCallServiceLists"})
+@ToString(exclude = {"monthlyCallServices", "results", "monthlyCallServiceLists", "individualResults"})
+@EqualsAndHashCode(exclude = {"monthlyCallServices", "results", "monthlyCallServiceLists", "individualResults"})
 @Entity
 @Table(name = "phone_number")
 public class PhoneNumber {

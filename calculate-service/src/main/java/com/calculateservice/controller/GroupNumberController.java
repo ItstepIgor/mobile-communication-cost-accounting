@@ -25,9 +25,18 @@ public class GroupNumberController {
             summary = "Добавление правил к группе",
             description = "Добавление правил для одноразовых услуг к группам"
     )
-    @GetMapping("/rule")
+    @GetMapping("/addrule")
     public void addRuleToGroupNumber(@RequestParam Long groupId, @RequestParam Long ruleId) {
         groupNumberService.addRuleToGroup(groupId, ruleId);
+    }
+
+    @Operation(
+            summary = "Удалени правил из группы",
+            description = "Удалени правил для одноразовых услуг из группы"
+    )
+    @GetMapping("/removerule")
+    public void removeRuleFromGroupNumber(@RequestParam Long groupId, @RequestParam Long ruleId) {
+        groupNumberService.removeRuleFromGroup(groupId, ruleId);
     }
 
 

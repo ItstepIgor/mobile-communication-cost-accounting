@@ -2,6 +2,8 @@ package com.calculateservice.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 
 @Data
 @AllArgsConstructor
@@ -17,5 +19,7 @@ public class PhoneNumberDTO {
     private long groupNumberId;
 
     private long mobileOperatorId;
+
+    private List<MonthlyCallServiceListDTO> monthlyCallServiceListDTOs;
 
 }
