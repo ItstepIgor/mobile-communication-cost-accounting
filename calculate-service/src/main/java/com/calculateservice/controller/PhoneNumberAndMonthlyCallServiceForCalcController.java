@@ -2,7 +2,6 @@ package com.calculateservice.controller;
 
 import com.calculateservice.dto.MonthlyCallServiceListDTO;
 import com.calculateservice.dto.PhoneNumberDTO;
-import com.calculateservice.service.AddMonthlyServiceToNumberService;
 import com.calculateservice.service.MonthlyCallServiceListService;
 import com.calculateservice.service.PhoneNumberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,8 +18,6 @@ import java.util.List;
 @CrossOrigin("http://localhost:8765")
 public class PhoneNumberAndMonthlyCallServiceForCalcController {
 
-    private final AddMonthlyServiceToNumberService addMonthlyServiceToNumberService;
-
     private final PhoneNumberService phoneNumberService;
 
     private final MonthlyCallServiceListService monthlyCallServiceListService;
@@ -32,7 +29,16 @@ public class PhoneNumberAndMonthlyCallServiceForCalcController {
     )
     @GetMapping("/addservice")
     public void addMonthlyCallServiceToNumber(@RequestParam Long numberId, @RequestParam Long serviceId) {
-        addMonthlyServiceToNumberService.addMonthlyCallServiceToNumber(numberId, serviceId);
+        phoneNumberService.addMonthlyCallServiceToNumber(numberId, serviceId);
+    }
+
+    @Operation(
+            summary = "Удаление ежемесячных услуг",
+            description = "Удаление ежемесячных услуг у номерам (за которые оплачиваюет предприятие)"
+    )
+    @GetMapping("/removeservice")
+    public void removeMonthlyCallServiceToNumber(@RequestParam Long numberId, @RequestParam Long serviceId) {
+        phoneNumberService.removeMonthlyCallServiceToNumber(numberId, serviceId);
     }
 
     @Operation(
@@ -72,6 +78,16 @@ public class PhoneNumberAndMonthlyCallServiceForCalcController {
     @GetMapping("/getservices")
     public List<MonthlyCallServiceListDTO> findAllServices() {
         return monthlyCallServiceListService.findAll();
+    }
+
+
+    @Operation(
+            summary = "Удаление номеров ",
+            description = "Удаление номеров"
+    )
+    @DeleteMapping("/{id}")
+    public void deleteGroupNumber(@PathVariable long id) {
+        phoneNumberService.delete(id);
     }
 
 }

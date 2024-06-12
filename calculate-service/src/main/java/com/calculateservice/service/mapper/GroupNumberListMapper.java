@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = GroupNumber.class)
+@Mapper(componentModel = "spring", uses = {GroupNumber.class, GroupNumberMapper.class})
 public interface GroupNumberListMapper {
 
     List<GroupNumberDTO> toListDTO(List<GroupNumber> phoneNumber);

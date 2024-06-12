@@ -10,13 +10,15 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring",
         uses = {GroupNumberService.class,
                 MobileOperatorService.class,
-                GroupNumberMapper.class})
+                GroupNumberMapper.class,
+                MonthlyCallServiceListMapper.class})
 public interface PhoneNumberMapper {
 
 
     @Mapping(target = "groupNumberId", source = "groupNumber.id")
     @Mapping(target = "mobileOperatorId", source = "mobileOperator.id")
     @Mapping(target = "creationDate", source = "creationDate", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    @Mapping(target = "monthlyCallServiceListDTOs", source = "monthlyCallServiceLists")
     PhoneNumberDTO toDTO(PhoneNumber phoneNumber);
 
     @Mapping(target = "groupNumber", source = "groupNumberId")
