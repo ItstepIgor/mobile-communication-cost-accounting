@@ -15,6 +15,9 @@ public interface PhoneNumberRepository extends JpaRepository<PhoneNumber, Long> 
     PhoneNumber findPhoneNumberByNumber(Long number);
 
 
+    List<PhoneNumber> findAllPhoneByGroupNumberId(Long id);
+
+
     @Query(value = "SELECT o.owner_name      AS owner, " +
             "p.number                        AS number, " +
             "pos.position_name               AS position " +

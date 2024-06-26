@@ -12,13 +12,15 @@ public interface PhoneNumberService {
 
     PhoneNumberDTO findById(Long id);
 
-    void update (PhoneNumberDTO phoneNumberDto);
+    void update(PhoneNumberDTO phoneNumberDto);
 
-    void delete (long id);
+    void delete(long id);
 
     PhoneNumber findPhoneNumberByNumber(Long number);
 
-    List<PhoneNumberPojo> getListPhoneNumber (long mobileOperatorId);
+    List<PhoneNumberDTO> findAllPhonesByGroup(Long id);
+
+    List<PhoneNumberPojo> getListPhoneNumber(long mobileOperatorId);
 
     void addMonthlyCallServiceToNumber(Long numberId, Long serviceId);
 

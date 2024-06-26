@@ -42,8 +42,8 @@ public class PhoneNumberAndMonthlyCallServiceForCalcController {
     }
 
     @Operation(
-            summary = "Редактирование груп в номерах телефонов",
-            description = "Изменнение груп привязанных к номерам телефонов," +
+            summary = "Редактирование групп и оператора для номеров телефонов",
+            description = "Изменнение груп привязанных к номерам телефонов и оператора" +
                     " Если не указать дату и время, то береться текущее "
     )
     @PutMapping("/update")
@@ -80,6 +80,14 @@ public class PhoneNumberAndMonthlyCallServiceForCalcController {
         return monthlyCallServiceListService.findAll();
     }
 
+    @Operation(
+            summary = "Получение списка номеров по группе",
+            description = "Получение списка номеров определенной группы"
+    )
+    @GetMapping("/getphonesbygroup")
+    public List<PhoneNumberDTO> findAllPhonesByGroup(Long id) {
+        return phoneNumberService.findAllPhonesByGroup(id);
+    }
 
     @Operation(
             summary = "Удаление номеров ",

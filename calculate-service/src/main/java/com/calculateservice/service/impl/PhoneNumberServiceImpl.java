@@ -65,6 +65,11 @@ public class PhoneNumberServiceImpl implements PhoneNumberService {
     }
 
     @Override
+    public List<PhoneNumberDTO> findAllPhonesByGroup(Long id) {
+        return phoneNumberListMapper.toListDTO(phoneNumberRepository.findAllPhoneByGroupNumberId(id));
+    }
+
+    @Override
     public List<PhoneNumberPojo> getListPhoneNumber(long mobileOperatorId) {
         return phoneNumberRepository.getListPhoneNumber(mobileOperatorId);
     }
