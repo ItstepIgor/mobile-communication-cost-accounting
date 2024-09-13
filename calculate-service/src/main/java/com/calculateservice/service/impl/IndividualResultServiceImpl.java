@@ -43,7 +43,7 @@ public class IndividualResultServiceImpl implements IndividualResultService {
                 .stream().map(LandlineNumber::getNumber).toList();
         List<Call> allCallByNumber = callService.findAllCallByNumber(date, number);
         List<MonthlyCallService> monthlyCallServiceByDate = monthlyCallServiceService.findAllByDate(date);
-        List<TransferWorkDay> transferWorkDays = transferWorkDayService.findAllTransferWorkDay(date);
+        List<TransferWorkDay> transferWorkDays = transferWorkDayService.findAllTransferWorkDayByDate(date);
         List<RuleOneTimeService> ruleOneTimeServices = ruleService.findRuleOneTimeService(Long.parseLong(number));
         List<IndividualResult> individualResults = new ArrayList<>();
 

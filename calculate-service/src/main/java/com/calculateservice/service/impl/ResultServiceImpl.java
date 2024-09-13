@@ -43,7 +43,7 @@ public class ResultServiceImpl implements ResultService {
                 .stream().map(LandlineNumber::getNumber).toList();
         List<Call> allCalcByDate = callService.findAllByDate(date);
         List<MonthlyCallService> monthlyCallServiceByDate = monthlyCallServiceService.findAllByDate(date);
-        List<TransferWorkDay> transferWorkDays = transferWorkDayService.findAllTransferWorkDay(date);
+        List<TransferWorkDay> transferWorkDays = transferWorkDayService.findAllTransferWorkDayByDate(date);
         List<AllExpensesByPhoneNumberDTO> allExpensesByPhoneNumber =
                 importFeignClients.findAllExpensesByPhoneNumberMTS(date).getBody();
 
