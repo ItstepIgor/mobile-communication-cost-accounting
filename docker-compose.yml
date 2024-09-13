@@ -126,30 +126,30 @@ services:
       - config-service
 #      - discovery-service
 
-#  calculate-service:
-#    build:
-#      context: ./calculate-service
-#      dockerfile: Dockerfile
-#    image: calculate-service:latest
-#    container_name: calculatet-service-app
-#    ports:
-#      - "8083:8083"
-#    environment:
-#      POSTGRES_DB_HOST: calculate_db_service
-#      POSTGRES_DB_PORT: 5432
-#      POSTGRES_DB_USERNAME: postgres
-#      POSTGRES_DB_PASSWORD: sa
-#      CONSUL_HOST: consul
-#      CONSUL_PORT: 8500
-#      CONFIG_SERVICE_URL: http://config-service:8888
-#      KAFKA_URL: kafka_my_app:29093
-#      HOSTNAME: http://192.168.127.242:8765/calculate-service
-#    restart: always
-#    networks:
-#      - mobile-communication-net
-#    depends_on:
-#      - config-service
-#      - calculate_db_service
+  calculate-service:
+    build:
+      context: ./calculate-service
+      dockerfile: Dockerfile
+    image: calculate-service:latest
+    container_name: calculatet-service-app
+    ports:
+      - "8083:8083"
+    environment:
+      POSTGRES_DB_HOST: calculate_db_service
+      POSTGRES_DB_PORT: 5432
+      POSTGRES_DB_USERNAME: postgres
+      POSTGRES_DB_PASSWORD: sa
+      CONSUL_HOST: consul
+      CONSUL_PORT: 8500
+      CONFIG_SERVICE_URL: http://config-service:8888
+      KAFKA_URL: kafka_my_app:29093
+      HOSTNAME: http://192.168.127.242:8765/calculate-service
+    restart: always
+    networks:
+      - mobile-communication-net
+    depends_on:
+      - config-service
+      - calculate_db_service
 
   import-service:
     build:
