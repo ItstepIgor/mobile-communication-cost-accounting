@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/phone")
 @Tag(name = "Редактирование номеров и добавление ежемесячных услуг к номерам")
-@CrossOrigin("http://localhost:8765")
+@CrossOrigin
 public class PhoneNumberAndMonthlyCallServiceForCalcController {
 
     private final PhoneNumberService phoneNumberService;

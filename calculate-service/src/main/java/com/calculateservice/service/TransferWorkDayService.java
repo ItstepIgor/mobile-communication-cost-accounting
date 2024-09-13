@@ -1,12 +1,17 @@
 package com.calculateservice.service;
 
+import com.calculateservice.dto.TransferWorkDayDTO;
 import com.calculateservice.entity.TransferWorkDay;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface TransferWorkDayService {
-    List<TransferWorkDay> findAllTransferWorkDay(LocalDate date);
+    List<TransferWorkDay> findAllTransferWorkDayByDate(LocalDate date);
 
-    void save(TransferWorkDay transferWorkDay);
+    List<TransferWorkDayDTO> findAll();
+
+    void save(TransferWorkDayDTO transferWorkDayDTO);
+
+    void delete(long id);
 }
