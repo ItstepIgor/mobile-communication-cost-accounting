@@ -143,7 +143,7 @@ services:
       CONSUL_PORT: 8500
       CONFIG_SERVICE_URL: http://config-service:8888
       KAFKA_URL: kafka_my_app:29093
-      HOSTNAME: http://192.168.127.242:8765/calculate-service
+      HOSTNAME: http://${HOST_IP}:8765/calculate-service
     restart: always
     networks:
       - mobile-communication-net
@@ -168,7 +168,7 @@ services:
       CONSUL_PORT: 8500
       CONFIG_SERVICE_URL: http://config-service:8888
       KAFKA_URL: kafka_my_app:29093
-      HOSTNAME: http://192.168.127.242:8765/import-service
+      HOSTNAME: http:/${HOST_IP}:8765/import-service
 #      HOSTNAME: 172.24.120.99 - вместо IP можно взять адрес хоста из переменной окружения
     restart: always
     networks:
