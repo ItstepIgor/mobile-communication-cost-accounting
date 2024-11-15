@@ -18,11 +18,11 @@ spring:
     bootstrap-servers: ${KAFKA_URL:localhost:9093}
     fetch:
       max:
-        bytes: 4000000
+        bytes: 10000000
     max:
       partition:
         fetch:
-          bytes: 4000000
+          bytes: 10000000
     consumer:
       auto-offset-reset: earliest
       group-id: "default"
