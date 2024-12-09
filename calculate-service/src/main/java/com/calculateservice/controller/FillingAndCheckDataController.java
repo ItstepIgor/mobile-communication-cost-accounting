@@ -82,7 +82,8 @@ public class FillingAndCheckDataController {
 
     @Operation(
             summary = "Добавление перенесенных дней ",
-            description = "Добавление перенеса рабочих или выходных дней"
+            description = "Добавление перенеса рабочих или выходных дней 1 - выходные в будний день" +
+                    "2 - работа в субботу или воскресенье"
     )
     @PostMapping
     public void createTransferWorkDay(@RequestBody TransferWorkDayDTO transferWorkDayDTO) {
